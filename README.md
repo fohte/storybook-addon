@@ -35,6 +35,16 @@ export default config
 
 This wires up `overflow-check` and `external-resource-check` — no further setup needed.
 
+### overflow-check
+
+To exempt a selector across every story (e.g. a component whose oversized hit target never visibly clips anything), call `configureOverflowCheck()` once in `.storybook/preview.ts`. It's additive with a story's own `parameters.overflowCheck.ignoreSelectors` — both apply, since Storybook merges story-level parameters by replacing arrays rather than deep-merging them, and a story-level `ignoreSelectors` would otherwise silently drop the global list:
+
+```ts
+import { configureOverflowCheck } from '@fohte/storybook-addon/preview'
+
+configureOverflowCheck({ ignoreSelectors: ['[data-slot="checkbox"]'] })
+```
+
 ### unhandled-api-request-check
 
 This check needs to know which paths count as "API requests" (that's app-specific), and needs to be fed unhandled requests from your MSW setup. Configure it once and call `reportUnhandledApiRequest()` from `onUnhandledRequest` in `.storybook/preview.ts`:

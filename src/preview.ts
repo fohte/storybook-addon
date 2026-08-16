@@ -10,6 +10,7 @@ import { externalResourceCheck } from '#checks/external-resource-check.js'
 import { overflowCheck } from '#checks/overflow-check.js'
 import { unhandledApiRequestCheck } from '#checks/unhandled-api-request-check.js'
 
+export { configureOverflowCheck } from '#checks/overflow-check.js'
 export {
   configureUnhandledApiRequestCheck,
   reportUnhandledApiRequest,
