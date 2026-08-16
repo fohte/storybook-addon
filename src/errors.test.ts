@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { BoundaryError } from '#errors'
+import { BoundaryError } from '#errors.js'
 
 class TaskStorePersistenceError extends BoundaryError {}
 

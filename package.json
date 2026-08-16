@@ -1,12 +1,33 @@
 {
-  "name": "storybook-addon",
-  "private": true,
+  "name": "@fohte/storybook-addon",
+  "description": "@fohte's personal Storybook addons",
+  "license": "MIT",
+  "author": "Hayato Kawai <fohte.hk@gmail.com>",
   "packageManager": "pnpm@11.20.0",
   "type": "module",
+  "exports": {
+    "./preview": {
+      "types": "./lib/preview.d.ts",
+      "default": "./lib/preview.js"
+    }
+  },
   "imports": {
-    "#*": "./src/*.ts"
+    "#*.js": "./lib/*.js"
+  },
+  "files": [
+    "lib",
+    "!lib/**/*.map",
+    "!lib/**/*.test.*"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
+    "clean": "rimraf lib tsconfig.tsbuildinfo",
+    "prebuild": "pnpm run clean",
+    "build": "tsc --project tsconfig.build.json",
+    "prepublishOnly": "pnpm run lint && pnpm run build",
     "lint": "eslint .",
     "format:eslint": "eslint --fix .",
     "format:prettier": "prettier --write .",
@@ -14,6 +35,10 @@
     "test": "conc pnpm:test:type pnpm:test:unit",
     "test:type": "tsc --noEmit",
     "test:unit": "vitest run"
+  },
+  "peerDependencies": {
+    "storybook": "^10.0.0",
+    "vitest": "^4.0.0"
   },
   "dependencies": {
     "neverthrow": "8.2.0"
@@ -25,10 +50,14 @@
     "@ninoseki/eslint-plugin-neverthrow": "0.2.0",
     "@tsconfig/node-lts": "24.0.0",
     "@tsconfig/strictest": "2.0.8",
+    "@types/jsdom": "30.0.0",
     "@types/node": "24.13.3",
     "concurrently": "10.0.4",
     "eslint": "10.6.0",
+    "jsdom": "30.0.1",
     "prettier": "3.9.6",
+    "rimraf": "6.1.3",
+    "storybook": "10.5.7",
     "typescript": "6.0.3",
     "vitest": "4.1.10"
   }
