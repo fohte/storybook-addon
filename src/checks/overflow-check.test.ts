@@ -21,14 +21,16 @@ function mockSize(
   })
 }
 
-// overflowCheck.reset() watches document.body for the story's root element
-// via MutationObserver, whose callback fires as a microtask — awaiting once
-// lets it run before the element is used.
-async function mountStoryRoot(): Promise<HTMLElement> {
-  overflowCheck.reset()
+// The consuming app's canvasElement is the story's mount container, created
+// fresh by Storybook for each story — but not necessarily appended to
+// document.body itself (e.g. it can be nested inside a static wrapper the
+// app's decorators reuse across stories, as opposed to being appended to
+// body directly on every render).
+function mountStoryRoot(): HTMLElement {
+  const wrapper = document.createElement('div')
+  document.body.appendChild(wrapper)
   const root = document.createElement('div')
-  document.body.appendChild(root)
-  await Promise.resolve()
+  wrapper.append(root)
   return root
 }
 
@@ -37,27 +39,25 @@ afterEach(() => {
 })
 
 describe('overflowCheck', () => {
-  it('does not throw when the story root was never detected', () => {
-    overflowCheck.reset()
-
+  it('does not throw when no canvasElement is provided', () => {
     expect(() => {
-      overflowCheck.assert(undefined)
+      overflowCheck.assert(undefined, undefined)
     }).not.toThrow()
   })
 
-  it('passes when nothing overflows', async () => {
-    const root = await mountStoryRoot()
+  it('passes when nothing overflows', () => {
+    const root = mountStoryRoot()
     const child = document.createElement('div')
     mockSize(child, { scrollWidth: 100, clientWidth: 100 })
     root.append(child)
 
     expect(() => {
-      overflowCheck.assert(undefined)
+      overflowCheck.assert(undefined, root)
     }).not.toThrow()
   })
 
-  it('fails and describes the overflowing element', async () => {
-    const root = await mountStoryRoot()
+  it('fails and describes the overflowing element', () => {
+    const root = mountStoryRoot()
     const child = document.createElement('div')
     child.id = 'chip-row'
     mockSize(child, { scrollWidth: 150, clientWidth: 100 })
@@ -65,7 +65,7 @@ describe('overflowCheck', () => {
 
     expect(
       messageOf(() => {
-        overflowCheck.assert(undefined)
+        overflowCheck.assert(undefined, root)
       }),
     ).toEqual(
       'Story has element(s) overflowing their container (clipped and invisible):\n' +
@@ -73,56 +73,83 @@ describe('overflowCheck', () => {
     )
   })
 
-  it('excludes text-overflow: ellipsis as intentional truncation', async () => {
-    const root = await mountStoryRoot()
+  it('detects overflow inside a wrapper that already existed in document.body before the story started', () => {
+    // A repo whose decorators reuse an existing element instead of
+    // appending a fresh one to document.body per story (the t-rader bug):
+    // the wrapper predates this story, and only its *contents* change, so
+    // document.body itself never gets a new child during the story.
+    const staticWrapper = document.createElement('div')
+    document.body.appendChild(staticWrapper)
+    overflowCheck.reset()
+
+    const root = document.createElement('div')
+    staticWrapper.append(root)
+    const child = document.createElement('div')
+    child.id = 'chip-row'
+    mockSize(child, { scrollWidth: 150, clientWidth: 100 })
+    root.append(child)
+
+    expect(
+      messageOf(() => {
+        overflowCheck.assert(undefined, root)
+      }),
+    ).toEqual(
+      'Story has element(s) overflowing their container (clipped and invisible):\n' +
+        'div#chip-row: scrollWidth=150 > clientWidth=100 (+50px)',
+    )
+  })
+
+  it('excludes text-overflow: ellipsis as intentional truncation', () => {
+    const root = mountStoryRoot()
     const child = document.createElement('div')
     child.style.textOverflow = 'ellipsis'
     mockSize(child, { scrollWidth: 150, clientWidth: 100 })
     root.append(child)
 
     expect(() => {
-      overflowCheck.assert(undefined)
+      overflowCheck.assert(undefined, root)
     }).not.toThrow()
   })
 
-  it('excludes visually-hidden elements (<=1x1px)', async () => {
-    const root = await mountStoryRoot()
+  it('excludes visually-hidden elements (<=1x1px)', () => {
+    const root = mountStoryRoot()
     const child = document.createElement('div')
     mockSize(child, { scrollWidth: 150, clientWidth: 1, clientHeight: 1 })
     root.append(child)
 
     expect(() => {
-      overflowCheck.assert(undefined)
+      overflowCheck.assert(undefined, root)
     }).not.toThrow()
   })
 
-  it('skips the check when parameters.overflowCheck.disable is true', async () => {
-    const root = await mountStoryRoot()
+  it('skips the check when parameters.overflowCheck.disable is true', () => {
+    const root = mountStoryRoot()
     const child = document.createElement('div')
     mockSize(child, { scrollWidth: 150, clientWidth: 100 })
     root.append(child)
 
     expect(() => {
-      overflowCheck.assert({ overflowCheck: { disable: true } })
+      overflowCheck.assert({ overflowCheck: { disable: true } }, root)
     }).not.toThrow()
   })
 
-  it('excludes elements matching parameters.overflowCheck.ignoreSelectors', async () => {
-    const root = await mountStoryRoot()
+  it('excludes elements matching parameters.overflowCheck.ignoreSelectors', () => {
+    const root = mountStoryRoot()
     const child = document.createElement('div')
     child.className = 'chip-row'
     mockSize(child, { scrollWidth: 150, clientWidth: 100 })
     root.append(child)
 
     expect(() => {
-      overflowCheck.assert({
-        overflowCheck: { ignoreSelectors: ['.chip-row'] },
-      })
+      overflowCheck.assert(
+        { overflowCheck: { ignoreSelectors: ['.chip-row'] } },
+        root,
+      )
     }).not.toThrow()
   })
 
-  it('groups an overflowing descendant under its overflowing ancestor', async () => {
-    const root = await mountStoryRoot()
+  it('groups an overflowing descendant under its overflowing ancestor', () => {
+    const root = mountStoryRoot()
     const parent = document.createElement('div')
     parent.id = 'parent'
     mockSize(parent, { scrollWidth: 200, clientWidth: 100 })
@@ -134,7 +161,7 @@ describe('overflowCheck', () => {
 
     expect(
       messageOf(() => {
-        overflowCheck.assert(undefined)
+        overflowCheck.assert(undefined, root)
       }),
     ).toEqual(
       'Story has element(s) overflowing their container (clipped and invisible):\n' +

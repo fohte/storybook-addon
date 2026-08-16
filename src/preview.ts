@@ -57,5 +57,7 @@ export const beforeEach: BeforeEach<WebRenderer> = () => {
 }
 
 export const afterEach: AfterEach<WebRenderer> = (context) => {
-  for (const check of checks) check.assert(context.parameters)
+  for (const check of checks) {
+    check.assert(context.parameters, context.canvasElement)
+  }
 }
