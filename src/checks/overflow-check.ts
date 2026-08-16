@@ -1,36 +1,6 @@
 import type { StorybookCheck } from '#checks/check.js'
 import { throwIfNotEmpty } from '#checks/check.js'
 
-// The consuming app's preview.ts calls reset()/assert() around each story
-// render (see preview.ts's beforeEach/afterEach). The story's container is a
-// bare <div> appended to document.body before anything is mounted into it —
-// reset() never gets `context.canvasElement` itself, so this is the only way
-// to reach the same element. Portal-based components (dialogs, popovers,
-// selects, etc.) append their own <div>s directly to document.body too, but
-// only *after* the story has mounted — so the container is reliably the
-// *first* element appended to body once a story starts, not the last. A
-// MutationObserver set up in reset() (which runs before the story mounts)
-// captures it.
-let storyRoot: Element | null = null
-let bodyObserver: MutationObserver | null = null
-
-function watchStoryRoot(): void {
-  storyRoot = null
-  bodyObserver?.disconnect()
-  bodyObserver = new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-      for (const node of mutation.addedNodes) {
-        if (node instanceof Element) {
-          storyRoot = node
-          bodyObserver?.disconnect()
-          return
-        }
-      }
-    }
-  })
-  bodyObserver.observe(document.body, { childList: true })
-}
-
 function describeElement(el: Element): string {
   const id = el.id ? `#${el.id}` : ''
   const classAttr = el.getAttribute('class')
@@ -155,22 +125,23 @@ function ignoreSelectorsOf(overflowCheck: object | undefined): string[] {
 }
 
 export const overflowCheck: StorybookCheck = {
-  reset: watchStoryRoot,
-  assert: (storyParameters) => {
+  reset: () => {},
+  assert: (storyParameters, canvasElement) => {
     const params = overflowCheckParameters(storyParameters)
     if (isDisabled(params)) return
-    if (storyRoot == null) {
-      // The MutationObserver in watchStoryRoot() hasn't seen an element
-      // appended to body yet (e.g. the story renders nothing). Skip rather
-      // than fail, since there is no root to scan.
+    if (canvasElement == null) {
+      // Real Storybook runs always pass canvasElement (it's the story's
+      // mount container); this only triggers a caller invoking assert()
+      // directly without one. Skip rather than fail, since there is no root
+      // to scan.
       console.warn(
-        '[overflow-check] story root not detected; skipping overflow scan',
+        '[overflow-check] no canvasElement in story context; skipping overflow scan',
       )
       return
     }
 
     throwIfNotEmpty(
-      findOverflows(storyRoot, ignoreSelectorsOf(params)),
+      findOverflows(canvasElement, ignoreSelectorsOf(params)),
       'Story has element(s) overflowing their container (clipped and invisible)',
     )
   },
