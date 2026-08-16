@@ -2,7 +2,7 @@
   "name": "@fohte/storybook-addon",
   "description": "@fohte's personal Storybook addons",
   "license": "MIT",
-  "author": "fohte <fohte.hk@gmail.com>",
+  "author": "Hayato Kawai <fohte.hk@gmail.com>",
   "packageManager": "pnpm@11.16.0",
   "type": "module",
   "exports": {
