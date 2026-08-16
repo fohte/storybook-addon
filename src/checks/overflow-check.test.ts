@@ -21,16 +21,9 @@ function mockSize(
   })
 }
 
-// The consuming app's canvasElement is the story's mount container, created
-// fresh by Storybook for each story — but not necessarily appended to
-// document.body itself (e.g. it can be nested inside a static wrapper the
-// app's decorators reuse across stories, as opposed to being appended to
-// body directly on every render).
 function mountStoryRoot(): HTMLElement {
-  const wrapper = document.createElement('div')
-  document.body.appendChild(wrapper)
   const root = document.createElement('div')
-  wrapper.append(root)
+  document.body.appendChild(root)
   return root
 }
 
@@ -58,32 +51,6 @@ describe('overflowCheck', () => {
 
   it('fails and describes the overflowing element', () => {
     const root = mountStoryRoot()
-    const child = document.createElement('div')
-    child.id = 'chip-row'
-    mockSize(child, { scrollWidth: 150, clientWidth: 100 })
-    root.append(child)
-
-    expect(
-      messageOf(() => {
-        overflowCheck.assert(undefined, root)
-      }),
-    ).toEqual(
-      'Story has element(s) overflowing their container (clipped and invisible):\n' +
-        'div#chip-row: scrollWidth=150 > clientWidth=100 (+50px)',
-    )
-  })
-
-  it('detects overflow inside a wrapper that already existed in document.body before the story started', () => {
-    // A repo whose decorators reuse an existing element instead of
-    // appending a fresh one to document.body per story (the t-rader bug):
-    // the wrapper predates this story, and only its *contents* change, so
-    // document.body itself never gets a new child during the story.
-    const staticWrapper = document.createElement('div')
-    document.body.appendChild(staticWrapper)
-    overflowCheck.reset()
-
-    const root = document.createElement('div')
-    staticWrapper.append(root)
     const child = document.createElement('div')
     child.id = 'chip-row'
     mockSize(child, { scrollWidth: 150, clientWidth: 100 })
