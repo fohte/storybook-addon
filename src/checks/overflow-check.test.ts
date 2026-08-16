@@ -1,6 +1,9 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
-import { overflowCheck } from '#checks/overflow-check.js'
+import {
+  configureOverflowCheck,
+  overflowCheck,
+} from '#checks/overflow-check.js'
 import { messageOf } from '#checks/test-helpers.js'
 
 function mockSize(
@@ -26,6 +29,10 @@ function mountStoryRoot(): HTMLElement {
   document.body.appendChild(root)
   return root
 }
+
+beforeEach(() => {
+  configureOverflowCheck({ ignoreSelectors: [] })
+})
 
 afterEach(() => {
   document.body.replaceChildren()
@@ -106,6 +113,38 @@ describe('overflowCheck', () => {
     child.className = 'chip-row'
     mockSize(child, { scrollWidth: 150, clientWidth: 100 })
     root.append(child)
+
+    expect(() => {
+      overflowCheck.assert(
+        { overflowCheck: { ignoreSelectors: ['.chip-row'] } },
+        root,
+      )
+    }).not.toThrow()
+  })
+
+  it('excludes elements matching configureOverflowCheck ignoreSelectors', () => {
+    configureOverflowCheck({ ignoreSelectors: ['.checkbox'] })
+    const root = mountStoryRoot()
+    const child = document.createElement('div')
+    child.className = 'checkbox'
+    mockSize(child, { scrollWidth: 150, clientWidth: 100 })
+    root.append(child)
+
+    expect(() => {
+      overflowCheck.assert(undefined, root)
+    }).not.toThrow()
+  })
+
+  it('applies both configureOverflowCheck and per-story ignoreSelectors, instead of the story replacing the global list', () => {
+    configureOverflowCheck({ ignoreSelectors: ['.checkbox'] })
+    const root = mountStoryRoot()
+    const globalIgnored = document.createElement('div')
+    globalIgnored.className = 'checkbox'
+    mockSize(globalIgnored, { scrollWidth: 150, clientWidth: 100 })
+    const storyIgnored = document.createElement('div')
+    storyIgnored.className = 'chip-row'
+    mockSize(storyIgnored, { scrollWidth: 150, clientWidth: 100 })
+    root.append(globalIgnored, storyIgnored)
 
     expect(() => {
       overflowCheck.assert(

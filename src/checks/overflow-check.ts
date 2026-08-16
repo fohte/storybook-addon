@@ -91,6 +91,20 @@ function findOverflows(root: Element, ignoreSelectors: string[]): string[] {
   return groupByAncestor(entries)
 }
 
+// Exempted everywhere, not per-story: configured once by the consuming app
+// for markup that recurs across many stories (e.g. a component whose
+// oversized hit target never visibly clips anything). Kept separate from
+// parameters.overflowCheck.ignoreSelectors — which storybook's
+// combineParameters replaces wholesale rather than merges — so a story
+// setting its own ignoreSelectors can't silently drop this list.
+let globalIgnoreSelectors: string[] = []
+
+export function configureOverflowCheck(options: {
+  ignoreSelectors: string[]
+}): void {
+  globalIgnoreSelectors = options.ignoreSelectors
+}
+
 function overflowCheckParameters(storyParameters: unknown): object | undefined {
   if (typeof storyParameters !== 'object' || storyParameters === null) {
     return undefined
@@ -141,7 +155,10 @@ export const overflowCheck: StorybookCheck = {
     }
 
     throwIfNotEmpty(
-      findOverflows(canvasElement, ignoreSelectorsOf(params)),
+      findOverflows(canvasElement, [
+        ...globalIgnoreSelectors,
+        ...ignoreSelectorsOf(params),
+      ]),
       'Story has element(s) overflowing their container (clipped and invisible)',
     )
   },
