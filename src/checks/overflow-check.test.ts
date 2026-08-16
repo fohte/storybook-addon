@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { overflowCheck } from '#checks/overflow-check.js'
+import { messageOf } from '#checks/test-helpers.js'
 
 function mockSize(
   el: HTMLElement,
@@ -35,16 +36,15 @@ afterEach(() => {
   document.body.replaceChildren()
 })
 
-function messageOf(fn: () => void): string {
-  try {
-    fn()
-  } catch (error) {
-    return error instanceof Error ? error.message : String(error)
-  }
-  return ''
-}
-
 describe('overflowCheck', () => {
+  it('does not throw when the story root was never detected', () => {
+    overflowCheck.reset()
+
+    expect(() => {
+      overflowCheck.assert(undefined)
+    }).not.toThrow()
+  })
+
   it('passes when nothing overflows', async () => {
     const root = await mountStoryRoot()
     const child = document.createElement('div')

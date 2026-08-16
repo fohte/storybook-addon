@@ -1,15 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { throwIfNotEmpty } from '#checks/check.js'
-
-function messageOf(fn: () => void): string {
-  try {
-    fn()
-  } catch (error) {
-    return error instanceof Error ? error.message : String(error)
-  }
-  return ''
-}
+import { messageOf } from '#checks/test-helpers.js'
 
 describe('throwIfNotEmpty', () => {
   it('does nothing when the list is empty', () => {

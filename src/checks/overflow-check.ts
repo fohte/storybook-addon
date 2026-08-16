@@ -159,7 +159,15 @@ export const overflowCheck: StorybookCheck = {
   assert: (storyParameters) => {
     const params = overflowCheckParameters(storyParameters)
     if (isDisabled(params)) return
-    if (storyRoot == null) return
+    if (storyRoot == null) {
+      // The MutationObserver in watchStoryRoot() hasn't seen an element
+      // appended to body yet (e.g. the story renders nothing). Skip rather
+      // than fail, since there is no root to scan.
+      console.warn(
+        '[overflow-check] story root not detected; skipping overflow scan',
+      )
+      return
+    }
 
     throwIfNotEmpty(
       findOverflows(storyRoot, ignoreSelectorsOf(params)),

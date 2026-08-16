@@ -8,6 +8,10 @@ import { throwIfNotEmpty } from '#checks/check.js'
 // screenshot diffs; fix stories by inlining the resource as a data URI.
 const externalResourceUrls: string[] = []
 
+// Entries older than this are from a previous story and must not be
+// attributed to the one currently rendering.
+let resetAt = 0
+
 function isExternalResourceUrl(url: string): boolean {
   const { protocol, origin } = new URL(url)
   return (
@@ -18,7 +22,7 @@ function isExternalResourceUrl(url: string): boolean {
 
 new PerformanceObserver((list) => {
   for (const entry of list.getEntries()) {
-    if (isExternalResourceUrl(entry.name)) {
+    if (entry.startTime >= resetAt && isExternalResourceUrl(entry.name)) {
       externalResourceUrls.push(entry.name)
     }
   }
@@ -26,6 +30,7 @@ new PerformanceObserver((list) => {
 
 export const externalResourceCheck: StorybookCheck = {
   reset: () => {
+    resetAt = performance.now()
     externalResourceUrls.length = 0
   },
   assert: () => {

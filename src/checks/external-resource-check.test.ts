@@ -1,10 +1,12 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { messageOf } from '#checks/test-helpers.js'
 
 // jsdom doesn't implement PerformanceObserver, and the module under test
 // calls `new PerformanceObserver(...)` at module-load time — so the mock
 // must be in place, and the module imported dynamically, before this file's
 // static imports would otherwise load it.
-type PerformanceEntryLike = { name: string }
+type PerformanceEntryLike = { name: string; startTime?: number }
 type ObserverCallback = (list: {
   getEntries: () => PerformanceEntryLike[]
 }) => void
@@ -25,21 +27,18 @@ const { externalResourceCheck } =
   await import('#checks/external-resource-check.js')
 
 function emit(entries: PerformanceEntryLike[]): void {
-  capturedCallback?.({ getEntries: () => entries })
+  capturedCallback?.({
+    getEntries: () =>
+      entries.map((entry) => ({ startTime: performance.now(), ...entry })),
+  })
 }
 
-function messageOf(fn: () => void): string {
-  try {
-    fn()
-  } catch (error) {
-    return error instanceof Error ? error.message : String(error)
-  }
-  return ''
-}
+beforeEach(() => {
+  externalResourceCheck.reset()
+})
 
 describe('externalResourceCheck', () => {
   it('ignores same-origin resources', () => {
-    externalResourceCheck.reset()
     emit([{ name: `${window.location.origin}/logo.png` }])
 
     expect(() => {
@@ -48,7 +47,6 @@ describe('externalResourceCheck', () => {
   })
 
   it('records and fails on non-same-origin http(s) resources', () => {
-    externalResourceCheck.reset()
     emit([{ name: 'https://cdn.example.test/font.woff2' }])
 
     expect(
@@ -62,9 +60,16 @@ describe('externalResourceCheck', () => {
   })
 
   it('clears recorded resources on reset', () => {
-    externalResourceCheck.reset()
     emit([{ name: 'https://cdn.example.test/font.woff2' }])
     externalResourceCheck.reset()
+
+    expect(() => {
+      externalResourceCheck.assert()
+    }).not.toThrow()
+  })
+
+  it('ignores an entry whose startTime is before the last reset', () => {
+    emit([{ name: 'https://cdn.example.test/font.woff2', startTime: 0 }])
 
     expect(() => {
       externalResourceCheck.assert()

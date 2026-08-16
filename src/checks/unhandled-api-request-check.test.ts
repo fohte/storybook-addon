@@ -1,19 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
+import { messageOf } from '#checks/test-helpers.js'
 import {
   configureUnhandledApiRequestCheck,
   reportUnhandledApiRequest,
   unhandledApiRequestCheck,
 } from '#checks/unhandled-api-request-check.js'
-
-function messageOf(fn: () => void): string {
-  try {
-    fn()
-  } catch (error) {
-    return error instanceof Error ? error.message : String(error)
-  }
-  return ''
-}
 
 beforeEach(() => {
   unhandledApiRequestCheck.reset()
