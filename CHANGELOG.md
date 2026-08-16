@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.1](https://github.com/fohte/storybook-addon/compare/v0.1.0...v0.1.1) (2026-08-16)
+
+
+### Bug Fixes
+
+* **overflow-check:** keep global ignoreSelectors when a story sets its own ([#19](https://github.com/fohte/storybook-addon/issues/19)) ([46529c4](https://github.com/fohte/storybook-addon/commit/46529c420b84d00734e338b3889d90dc0d20d964))
+* **overflow-check:** make story root detection independent of document.body mutations ([#17](https://github.com/fohte/storybook-addon/issues/17)) ([2c49a15](https://github.com/fohte/storybook-addon/commit/2c49a1542365acb3a59b0d235ac2d19412f84e75))
+
 ## [0.1.0](https://github.com/fohte/storybook-addon/compare/v0.1.0...v0.1.0) (2026-08-16)
 
 
