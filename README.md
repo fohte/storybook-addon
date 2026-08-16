@@ -37,7 +37,7 @@ This wires up `overflow-check` and `external-resource-check` — no further setu
 
 ### overflow-check
 
-To exempt a selector across every story (e.g. a component whose oversized hit target never visibly clips anything), call `configureOverflowCheck()` once in `.storybook/preview.ts`. It's additive with a story's own `parameters.overflowCheck.ignoreSelectors` — both apply, since Storybook's `combineParameters` replaces arrays wholesale rather than merging them, and a story-level `ignoreSelectors` would otherwise silently drop the global list:
+To exempt a selector across every story (e.g. a component whose oversized hit target never visibly clips anything), call `configureOverflowCheck()` once in `.storybook/preview.ts`. It's additive with a story's own `parameters.overflowCheck.ignoreSelectors` — both apply, since Storybook merges story-level parameters by replacing arrays rather than deep-merging them, and a story-level `ignoreSelectors` would otherwise silently drop the global list:
 
 ```ts
 import { configureOverflowCheck } from '@fohte/storybook-addon/preview'

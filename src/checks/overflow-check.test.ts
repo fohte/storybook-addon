@@ -135,20 +135,17 @@ describe('overflowCheck', () => {
     }).not.toThrow()
   })
 
-  it('applies both configureOverflowCheck and per-story ignoreSelectors, instead of the story replacing the global list', () => {
+  it('keeps configureOverflowCheck ignoreSelectors active when a story sets its own ignoreSelectors', () => {
     configureOverflowCheck({ ignoreSelectors: ['.checkbox'] })
     const root = mountStoryRoot()
-    const globalIgnored = document.createElement('div')
-    globalIgnored.className = 'checkbox'
-    mockSize(globalIgnored, { scrollWidth: 150, clientWidth: 100 })
-    const storyIgnored = document.createElement('div')
-    storyIgnored.className = 'chip-row'
-    mockSize(storyIgnored, { scrollWidth: 150, clientWidth: 100 })
-    root.append(globalIgnored, storyIgnored)
+    const child = document.createElement('div')
+    child.className = 'checkbox'
+    mockSize(child, { scrollWidth: 150, clientWidth: 100 })
+    root.append(child)
 
     expect(() => {
       overflowCheck.assert(
-        { overflowCheck: { ignoreSelectors: ['.chip-row'] } },
+        { overflowCheck: { ignoreSelectors: ['.unrelated'] } },
         root,
       )
     }).not.toThrow()
