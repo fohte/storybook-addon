@@ -3,7 +3,7 @@
   "description": "@fohte's personal Storybook addons",
   "license": "MIT",
   "author": "Hayato Kawai <fohte.hk@gmail.com>",
-  "packageManager": "pnpm@11.16.0",
+  "packageManager": "pnpm@11.20.0",
   "type": "module",
   "exports": {
     "./preview": {
