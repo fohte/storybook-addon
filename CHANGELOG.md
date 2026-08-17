@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/fohte/storybook-addon/compare/v0.1.1...v0.1.2) (2026-08-17)
+
+
+### Bug Fixes
+
+* **checks:** stop losing consumer-set config to bundler module duplication ([#21](https://github.com/fohte/storybook-addon/issues/21)) ([b86715e](https://github.com/fohte/storybook-addon/commit/b86715e67851989155789fd324eed9a9372aab7c))
+
 ## [0.1.1](https://github.com/fohte/storybook-addon/compare/v0.1.0...v0.1.1) (2026-08-16)
 
 
