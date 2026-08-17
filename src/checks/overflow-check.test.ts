@@ -130,19 +130,22 @@ describe('overflowCheck', () => {
     }).not.toThrow()
   })
 
-  it('keeps globalIgnoreSelectors active when a story sets its own ignoreSelectors', () => {
+  it('excludes elements matching either globalIgnoreSelectors or the story ignoreSelectors', () => {
     const root = mountStoryRoot()
-    const child = document.createElement('div')
-    child.className = 'checkbox'
-    mockSize(child, { scrollWidth: 150, clientWidth: 100 })
-    root.append(child)
+    const globalMatch = document.createElement('div')
+    globalMatch.className = 'checkbox'
+    mockSize(globalMatch, { scrollWidth: 150, clientWidth: 100 })
+    const storyMatch = document.createElement('div')
+    storyMatch.className = 'chip-row'
+    mockSize(storyMatch, { scrollWidth: 150, clientWidth: 100 })
+    root.append(globalMatch, storyMatch)
 
     expect(() => {
       overflowCheck.assert(
         {
           overflowCheck: {
             globalIgnoreSelectors: ['.checkbox'],
-            ignoreSelectors: ['.unrelated'],
+            ignoreSelectors: ['.chip-row'],
           },
         },
         root,
