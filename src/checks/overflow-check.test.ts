@@ -1,9 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
-import {
-  configureOverflowCheck,
-  overflowCheck,
-} from '#checks/overflow-check.js'
+import { overflowCheck } from '#checks/overflow-check.js'
 import { messageOf } from '#checks/test-helpers.js'
 
 function mockSize(
@@ -29,10 +26,6 @@ function mountStoryRoot(): HTMLElement {
   document.body.appendChild(root)
   return root
 }
-
-beforeEach(() => {
-  configureOverflowCheck({ ignoreSelectors: [] })
-})
 
 afterEach(() => {
   document.body.replaceChildren()
@@ -122,21 +115,7 @@ describe('overflowCheck', () => {
     }).not.toThrow()
   })
 
-  it('excludes elements matching configureOverflowCheck ignoreSelectors', () => {
-    configureOverflowCheck({ ignoreSelectors: ['.checkbox'] })
-    const root = mountStoryRoot()
-    const child = document.createElement('div')
-    child.className = 'checkbox'
-    mockSize(child, { scrollWidth: 150, clientWidth: 100 })
-    root.append(child)
-
-    expect(() => {
-      overflowCheck.assert(undefined, root)
-    }).not.toThrow()
-  })
-
-  it('keeps configureOverflowCheck ignoreSelectors active when a story sets its own ignoreSelectors', () => {
-    configureOverflowCheck({ ignoreSelectors: ['.checkbox'] })
+  it('excludes elements matching parameters.overflowCheck.globalIgnoreSelectors', () => {
     const root = mountStoryRoot()
     const child = document.createElement('div')
     child.className = 'checkbox'
@@ -145,7 +124,27 @@ describe('overflowCheck', () => {
 
     expect(() => {
       overflowCheck.assert(
-        { overflowCheck: { ignoreSelectors: ['.unrelated'] } },
+        { overflowCheck: { globalIgnoreSelectors: ['.checkbox'] } },
+        root,
+      )
+    }).not.toThrow()
+  })
+
+  it('keeps globalIgnoreSelectors active when a story sets its own ignoreSelectors', () => {
+    const root = mountStoryRoot()
+    const child = document.createElement('div')
+    child.className = 'checkbox'
+    mockSize(child, { scrollWidth: 150, clientWidth: 100 })
+    root.append(child)
+
+    expect(() => {
+      overflowCheck.assert(
+        {
+          overflowCheck: {
+            globalIgnoreSelectors: ['.checkbox'],
+            ignoreSelectors: ['.unrelated'],
+          },
+        },
         root,
       )
     }).not.toThrow()
