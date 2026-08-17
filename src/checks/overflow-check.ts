@@ -91,20 +91,6 @@ function findOverflows(root: Element, ignoreSelectors: string[]): string[] {
   return groupByAncestor(entries)
 }
 
-// Exempted everywhere, not per-story: configured once by the consuming app
-// for markup that recurs across many stories (e.g. a component whose
-// oversized hit target never visibly clips anything). Kept separate from
-// parameters.overflowCheck.ignoreSelectors — which storybook's
-// combineParameters replaces wholesale rather than merges — so a story
-// setting its own ignoreSelectors can't silently drop this list.
-let globalIgnoreSelectors: string[] = []
-
-export function configureOverflowCheck(options: {
-  ignoreSelectors: string[]
-}): void {
-  globalIgnoreSelectors = options.ignoreSelectors
-}
-
 function overflowCheckParameters(storyParameters: unknown): object | undefined {
   if (typeof storyParameters !== 'object' || storyParameters === null) {
     return undefined
@@ -138,6 +124,23 @@ function ignoreSelectorsOf(overflowCheck: object | undefined): string[] {
   return ignoreSelectors.filter((s): s is string => typeof s === 'string')
 }
 
+// A separate key from `ignoreSelectors`, set once by the consuming app in
+// its top-level `preview.ts` `parameters` export (not via a module-level
+// setter — a story's own `parameters.overflowCheck` and the app's global one
+// live in different Storybook parameter scopes, which Storybook deep-merges
+// by object key, so a story setting `ignoreSelectors` can't drop this list).
+// This also sidesteps bundlers that resolve this addon's module twice for
+// one consumer (once from the app's own import, once via Storybook's addon
+// loader) — `context.parameters` comes from Storybook itself, not from
+// either module instance, so it's unaffected either way.
+function globalIgnoreSelectorsOf(overflowCheck: object | undefined): string[] {
+  if (overflowCheck === undefined) return []
+  if (!('globalIgnoreSelectors' in overflowCheck)) return []
+  const { globalIgnoreSelectors } = overflowCheck
+  if (!Array.isArray(globalIgnoreSelectors)) return []
+  return globalIgnoreSelectors.filter((s): s is string => typeof s === 'string')
+}
+
 export const overflowCheck: StorybookCheck = {
   reset: () => {},
   assert: (storyParameters, canvasElement) => {
@@ -156,7 +159,7 @@ export const overflowCheck: StorybookCheck = {
 
     throwIfNotEmpty(
       findOverflows(canvasElement, [
-        ...globalIgnoreSelectors,
+        ...globalIgnoreSelectorsOf(params),
         ...ignoreSelectorsOf(params),
       ]),
       'Story has element(s) overflowing their container (clipped and invisible)',
