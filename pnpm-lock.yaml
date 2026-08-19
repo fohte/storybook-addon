@@ -19,8 +19,8 @@ importers:
         specifier: 3.3.6
         version: 3.3.6(supports-color@10.2.2)
       '@fohte/eslint-config':
-        specifier: 0.4.0
-        version: 0.4.0(36436f5bb665ec423ff4da2115dcf97b)
+        specifier: 0.4.1
+        version: 0.4.1(36436f5bb665ec423ff4da2115dcf97b)
       '@ninoseki/eslint-plugin-neverthrow':
         specifier: 0.2.0
         version: 0.2.0(eslint@10.6.0(jiti@2.6.1)(supports-color@10.2.2))(typescript@6.0.3)
@@ -440,8 +440,8 @@ packages:
       '@noble/hashes':
         optional: true
 
-  '@fohte/eslint-config@0.4.0':
-    resolution: {integrity: sha512-po8eL4hrVhpkn97iU82ttnvMBTtmH7TNOmJz4DsTMTgEeIEDtFV8Pp8zBz2GfrEOLDTePYwiDnFW+LkPxmkGkw==}
+  '@fohte/eslint-config@0.4.1':
+    resolution: {integrity: sha512-mvF4IkJQOq7TH27XfTPBhQPK6MbPUWcSOQgJlL2QvIdH4AR350ajv+EXUc9f7loKIAlpRqBaKZvOehwLlWUvGA==}
     engines: {node: '>=20.19.0 || >=22.13.0'}
     peerDependencies:
       '@eslint-community/eslint-plugin-eslint-comments': ^4.0.0
@@ -453,9 +453,12 @@ packages:
       eslint-config-prettier: ^10.0.0
       eslint-plugin-import-x: ^4.0.0
       eslint-plugin-simple-import-sort: ^13.0.0
+      eslint-plugin-tailwindcss: ^4.0.0
       typescript: '>=5.0.0'
     peerDependenciesMeta:
       '@ninoseki/eslint-plugin-neverthrow':
+        optional: true
+      eslint-plugin-tailwindcss:
         optional: true
       typescript:
         optional: true
@@ -2605,7 +2608,7 @@ snapshots:
 
   '@exodus/bytes@1.15.1': {}
 
-  '@fohte/eslint-config@0.4.0(36436f5bb665ec423ff4da2115dcf97b)':
+  '@fohte/eslint-config@0.4.1(36436f5bb665ec423ff4da2115dcf97b)':
     dependencies:
       '@eslint-community/eslint-plugin-eslint-comments': 4.7.2(eslint@10.6.0(jiti@2.6.1)(supports-color@10.2.2))
       '@typescript-eslint/eslint-plugin': 8.66.0(@typescript-eslint/parser@8.66.0(eslint@10.6.0(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint@10.6.0(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
