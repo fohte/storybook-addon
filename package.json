@@ -13,6 +13,10 @@
     "./preview": {
       "types": "./lib/preview.d.ts",
       "default": "./lib/preview.js"
+    },
+    "./vitest-plugin": {
+      "types": "./lib/vitest-plugin.d.ts",
+      "default": "./lib/vitest-plugin.js"
     }
   },
   "imports": {
@@ -41,8 +45,22 @@
     "test:unit": "vitest run"
   },
   "peerDependencies": {
+    "@storybook/addon-vitest": "^10.0.0",
+    "@storycap-testrun/browser": "^2.0.0",
+    "@vitest/browser-playwright": "^4.0.0",
     "storybook": "^10.0.0",
     "vitest": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@storybook/addon-vitest": {
+      "optional": true
+    },
+    "@storycap-testrun/browser": {
+      "optional": true
+    },
+    "@vitest/browser-playwright": {
+      "optional": true
+    }
   },
   "dependencies": {
     "neverthrow": "8.2.0"
@@ -52,10 +70,13 @@
     "@eslint/eslintrc": "3.3.6",
     "@fohte/eslint-config": "0.4.1",
     "@ninoseki/eslint-plugin-neverthrow": "0.2.0",
+    "@storybook/addon-vitest": "10.5.7",
+    "@storycap-testrun/browser": "2.1.1",
     "@tsconfig/node-lts": "24.0.0",
     "@tsconfig/strictest": "2.0.8",
     "@types/jsdom": "30.0.0",
     "@types/node": "24.13.3",
+    "@vitest/browser-playwright": "4.1.10",
     "concurrently": "10.0.4",
     "eslint": "10.6.0",
     "jsdom": "30.0.1",
