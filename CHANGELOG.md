@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/fohte/storybook-addon/compare/v0.1.2...v0.1.3) (2026-08-19)
+
+
+### Features
+
+* **vitest-plugin:** add subpath export ([#26](https://github.com/fohte/storybook-addon/issues/26)) ([4e2e3da](https://github.com/fohte/storybook-addon/commit/4e2e3da868f5f94ca1919df21f8b4a5f78f541f7))
+
 ## [0.1.2](https://github.com/fohte/storybook-addon/compare/v0.1.1...v0.1.2) (2026-08-17)
 
 
