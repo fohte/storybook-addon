@@ -8,23 +8,10 @@ import { playwright } from '@vitest/browser-playwright'
 // `Plugin` type, so it's structurally identical but nominally unrelated to
 // ours — cast to sidestep the resulting "unrelated types" error. Typing this
 // as `Plugin` (instead of `any`) reintroduces a cascading "exactOptionalPropertyTypes"
-// mismatch between vite's own `Plugin` and rollup's, so this stays `any` and
-// the unsafe-assignment at each call site is suppressed individually instead.
+// mismatch between vite's own `Plugin` and rollup's, so this stays `any`.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see comment above
 function asPlugin(plugin: unknown): any {
   return plugin
-}
-
-// `playwright()` returns vitest's own `BrowserProviderOption<PlaywrightProviderOptions>`
-// (this is the exact usage vitest's own JSDoc on `browser.provider` recommends), but that
-// interface is self-referential (providerFactory -> TestProject -> ProjectConfig ->
-// browser.provider -> BrowserProviderOption again). Under `exactOptionalPropertyTypes: true`,
-// TypeScript's structural comparison of that recursive generic against the target's
-// `BrowserProviderOption<object>` bails out with a spurious "two different types with this
-// name exist, but they are unrelated" — cast to sidestep it.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- see comment above
-function asProvider(provider: unknown): any {
-  return provider
 }
 
 // @storycap-testrun/browser waits for 500ms of network silence before every
@@ -81,9 +68,9 @@ export interface CreateStorybookProjectOptions {
   viewport: { width: number; height: number }
   /**
    * Screenshots for this project are written to
-   * `<rootDir>/__screenshots__/<screenshotsSubdir>`. The shared VRT workflow's
-   * reg-suit step reads from this path, so treat it as a cross-repo contract
-   * rather than an implementation detail.
+   * `<rootDir>/__screenshots__/<screenshotsSubdir>`. Downstream tooling that
+   * consumes these images depends on this exact path, so treat it as a
+   * stable contract rather than an implementation detail.
    */
   screenshotsSubdir: string
   setupFiles: string[]
@@ -116,6 +103,12 @@ export function createStorybookProject({
   )
   const maxWorkers = process.env['CI'] != null ? ciMaxWorkers : undefined
 
+  // storybookTest() below returns a Promise that starts loading a real
+  // Storybook config from `configDir` as soon as it's constructed — nothing
+  // but Vite's own plugin container ever awaits that Promise, so calling
+  // this factory directly against a synthetic `rootDir` in a unit test
+  // surfaces it as an unhandled rejection instead of a useful assertion.
+  // This branch is covered by running against a real Storybook config instead.
   return {
     plugins: [
       storycapNetworkIdle,
@@ -138,10 +131,7 @@ export function createStorybookProject({
         // Pin the browser's timezone so time-dependent stories (calendar
         // "now" indicators, relative timestamps) render identically
         // regardless of the host machine's local timezone.
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- asProvider casts through `any`, see comment above its definition
-        provider: asProvider(
-          playwright({ contextOptions: { timezoneId: 'Asia/Tokyo' } }),
-        ),
+        provider: playwright({ contextOptions: { timezoneId: 'Asia/Tokyo' } }),
         headless: true,
         instances: [{ browser: 'chromium' as const }],
       },

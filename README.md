@@ -22,6 +22,8 @@ pnpm add -D storybook vitest
 pnpm add -D @storybook/addon-vitest @storycap-testrun/browser @vitest/browser-playwright
 ```
 
+`@vitest/browser-playwright` pins its own `vitest` peer to its exact version (e.g. `4.1.10` requires `vitest@4.1.10` precisely), even though this package's own `peerDependencies` range for both is the looser `^4.0.0`. Keep the two installed at the same version.
+
 ## Usage
 
 Add the addon to `.storybook/main.ts`:
@@ -100,7 +102,7 @@ export default defineConfig({
 })
 ```
 
-Screenshots for a project land in `<rootDir>/__screenshots__/<screenshotsSubdir>` — this is the default the shared VRT workflow's reg-suit step reads from, so treat it as a cross-repo contract rather than an implementation detail. Keep the two in sync if you ever change `screenshotsSubdir` or `rootDir`.
+Screenshots for a project land in `<rootDir>/__screenshots__/<screenshotsSubdir>` — downstream tooling that consumes these images depends on this exact path, so treat it as a stable contract rather than an implementation detail.
 
 `storycapNetworkIdle` is also exported on its own, for building a project without `createStorybookProject`.
 
