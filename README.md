@@ -17,7 +17,12 @@ pnpm add -D @fohte/storybook-addon
 
 # Peer dependencies
 pnpm add -D storybook vitest
+
+# Peer dependencies for ./vitest-plugin only
+pnpm add -D @storybook/addon-vitest @storycap-testrun/browser @vitest/browser-playwright
 ```
+
+`@vitest/browser-playwright` pins its own `vitest` peer to its exact version (e.g. `4.1.10` requires `vitest@4.1.10` precisely), even though this package's own `peerDependencies` range for both is the looser `^4.0.0`. Keep the two installed at the same version.
 
 ## Usage
 
@@ -69,11 +74,49 @@ initialize({
 })
 ```
 
+## Vitest plugin (`./vitest-plugin`)
+
+Builds a Vitest browser-mode project that runs Storybook stories through [`@storybook/addon-vitest`](https://storybook.js.org/docs/writing-tests/integrations/vitest-addon) and captures a screenshot of each with [`@storycap-testrun/browser`](https://github.com/reg-viz/storycap-testrun), patched to shorten storycap's hardcoded 500ms network-idle wait to 100ms.
+
+```ts
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+import { createStorybookProject } from '@fohte/storybook-addon/vitest-plugin'
+import { defineConfig } from 'vitest/config'
+
+const rootDir = path.dirname(fileURLToPath(import.meta.url))
+
+export default defineConfig({
+  test: {
+    projects: [
+      createStorybookProject({
+        name: 'storybook',
+        rootDir,
+        viewport: { width: 1280, height: 800 },
+        screenshotsSubdir: 'desktop',
+        setupFiles: ['./.storybook/vitest.setup.ts'],
+      }),
+    ],
+  },
+})
+```
+
+Screenshots for a project land in `<rootDir>/__screenshots__/<screenshotsSubdir>` — downstream tooling that consumes these images depends on this exact path, so treat it as a stable contract rather than an implementation detail.
+
+`storycapNetworkIdle` is also exported on its own, for building a project without `createStorybookProject`.
+
+Your `setupFiles` entry needs an `afterEach` that calls storycap's own `screenshot()` — see [`@storycap-testrun/browser`'s "Setup Screenshot Capture"](https://github.com/reg-viz/storycap-testrun/tree/main/packages/browser#2-setup-screenshot-capture) for the exact shape. Don't call `setProjectAnnotations()` there, and don't even mention that identifier in a comment: `@storybook/addon-vitest` decides whether to inject this package's checks by a plain substring search over the setup file's source text, so its mere presence silently disables every check in the project, with no error.
+
+### Check failures don't block the screenshot
+
+This package's checks run inside `@storybook/addon-vitest`'s own render phase, as part of the generated test body — before your `setupFiles`' `afterEach` (the one that calls `screenshot()`) ever runs. A failing check throws there, but Vitest still runs every registered `afterEach` after a test regardless of pass or fail, so the screenshot capture always follows, against whatever the DOM looked like when the check failed. Verified against a story with a deliberate overflow: the check failed, and `screenshot()` still produced a non-blank image showing the actual overflowing content.
+
 ## Addon `afterEach` ordering
 
 Storybook runs multiple addons' `afterEach` hooks serially, in the **reverse** of the order they're listed in `main.ts`'s `addons` array — the addon listed last runs its `afterEach` first. The consuming app's own `preview.ts`/`preview.tsx` `afterEach` runs before every addon's `afterEach`. If one hook throws, the remaining ones are skipped (fail-fast).
 
-This matters once a screenshot-capturing addon is added: to keep "capture first, then let this package's checks fail the test" working, list that addon **after** `@fohte/storybook-addon` in the `addons` array.
+This doesn't apply to `./vitest-plugin`'s screenshot capture: it isn't a Storybook addon, so it never sits in the `addons` array at all — see "Check failures don't block the screenshot" above for how that ordering actually works.
 
 ## Development
 
