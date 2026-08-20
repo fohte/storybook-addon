@@ -60,13 +60,6 @@ async function getIframeBoundingBox(
 ): Promise<{ x: number; y: number; width: number; height: number }> {
   const box = await ctx.page.locator(IFRAME_SELECTOR).boundingBox()
   if (box) return box
-  // Centralizing the one place this repo has to convert Playwright's
-  // null-on-not-found into a hard failure, instead of repeating a Result
-  // unwrap-and-throw at each of this function's two call sites, both of
-  // which sit inside an otherwise plain await chain with nothing downstream
-  // that consumes a Result: everything from here up to vitest's own
-  // BrowserCommand contract is throw/reject-based, so there's no boundary
-  // left to defer to.
   // eslint-disable-next-line no-restricted-syntax -- interop boundary: BrowserCommand contract signals failure by rejecting
   throw new Error('Could not determine iframe position for screenshot')
 }
@@ -75,20 +68,29 @@ function screenshotOptionsFrom(options: TakeScreenshotOptions) {
   return {
     animations: 'disabled',
     caret: 'hide',
+    // Playwright's own default ('device') scales the returned buffer by
+    // deviceScaleFactor, but captureFullPage's canvas below is sized in CSS
+    // pixels — pin 'css' so a chunk's pixel dimensions always match the
+    // canvas region it gets drawn into.
+    scale: options.scale ?? 'css',
     ...(options.omitBackground != null && {
       omitBackground: options.omitBackground,
     }),
-    ...(options.scale != null && { scale: options.scale }),
     ...(options.type != null && { type: options.type }),
   } as const
 }
 
-async function captureFullPage(
+async function captureTiles(
   ctx: BrowserCommandContext,
   viewport: Viewport,
   scrollHeight: number,
   options: TakeScreenshotOptions,
 ): Promise<Buffer> {
+  // The iframe element's position on the outer page doesn't move when its
+  // own inner content scrolls, so this only needs to be read once per
+  // capture instead of once per tile.
+  const iframeBox = await getIframeBoundingBox(ctx)
+
   const images: string[] = []
   const heights: number[] = []
 
@@ -104,7 +106,6 @@ async function captureFullPage(
       viewport.height,
       scrollHeight,
     )
-    const iframeBox = await getIframeBoundingBox(ctx)
 
     const chunkBuffer = await ctx.page.screenshot({
       clip: {
@@ -155,9 +156,22 @@ async function captureFullPage(
     { images, width: viewport.width, heights, mimeType },
   )
 
-  await scrollIframeTo(ctx, 0)
-
   return Buffer.from(stitchedBase64, 'base64')
+}
+
+// Vitest's browser mode reuses one iframe per test file, so a scroll
+// position left behind by a failed capture would bleed into whichever
+// story runs next in the same file — reset it whether captureTiles()
+// succeeds or rejects.
+function captureFullPage(
+  ctx: BrowserCommandContext,
+  viewport: Viewport,
+  scrollHeight: number,
+  options: TakeScreenshotOptions,
+): Promise<Buffer> {
+  return captureTiles(ctx, viewport, scrollHeight, options).finally(() =>
+    scrollIframeTo(ctx, 0),
+  )
 }
 
 function takeScreenshot(
@@ -203,9 +217,10 @@ function takeScreenshot(
 }
 
 // Replaces @storycap-testrun/browser's `__storycap_takeScreenshot` command
-// (see storycapNetworkIdle in vitest-plugin.ts for how that package's own
-// command gets registered) with a from-scratch reimplementation that fixes
-// the fullPage tiling bug described above. Vite merges plugin `config()`
+// (registered by the `storycap` plugin passed to `createStorybookProject`,
+// via the same `config()` → `test.browser.commands` shape used below) with
+// a from-scratch reimplementation that fixes the fullPage tiling bug
+// described above. Vite merges plugin `config()`
 // hooks in plugin order, with later plugins overriding matching keys — so
 // this must be placed after the `storycap` plugin in `createStorybookProject`'s
 // `plugins` array for the override to take effect. `resolveScreenshotFilepath`,

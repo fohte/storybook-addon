@@ -104,7 +104,7 @@ export default defineConfig({
 
 Screenshots for a project land in `<rootDir>/__screenshots__/<screenshotsSubdir>` — downstream tooling that consumes these images depends on this exact path, so treat it as a stable contract rather than an implementation detail.
 
-`storycapNetworkIdle` and `storycapFullPageStitch` are also exported on their own, for building a project without `createStorybookProject`.
+`storycapNetworkIdle` and `storycapFullPageStitch` are also exported on their own, for building a project without `createStorybookProject`. `storycapFullPageStitch` must be placed after storycap's own plugin in the `plugins` array — it works by overriding the `__storycap_takeScreenshot` command storycap registers, and Vite resolves conflicting plugin `config()` keys in plugin order, later wins.
 
 Your `setupFiles` entry needs an `afterEach` that calls storycap's own `screenshot()` — see [`@storycap-testrun/browser`'s "Setup Screenshot Capture"](https://github.com/reg-viz/storycap-testrun/tree/main/packages/browser#2-setup-screenshot-capture) for the exact shape. Don't call `setProjectAnnotations()` there, and don't even mention that identifier in a comment: `@storybook/addon-vitest` decides whether to inject this package's checks by a plain substring search over the setup file's source text, so its mere presence silently disables every check in the project, with no error.
 

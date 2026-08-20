@@ -107,6 +107,39 @@ export function createStorybookProject({
   )
   const maxWorkers = process.env['CI'] != null ? ciMaxWorkers : undefined
 
+  const plugins = [
+    storycapNetworkIdle,
+    storybookTest({
+      configDir,
+      tags: { exclude: excludeTags },
+    }),
+    asPlugin(
+      storycap({
+        viewport,
+        output: { dir: screenshotsDir },
+      }),
+    ),
+    storycapFullPageStitch({ viewport }),
+  ]
+
+  // storycapFullPageStitch's own comment explains why plugin order is what
+  // makes it an override of storycap's `__storycap_takeScreenshot` — check
+  // that order here (by plugin name, since storycap's own plugin type is
+  // cast to `any` above) instead of leaving a reorder to silently resurrect
+  // the fullPage tiling bug it fixes.
+  const storycapIndex = plugins.findIndex(
+    (p: { name?: string }) => p.name === 'vitest:screenshot',
+  )
+  const fullPageStitchIndex = plugins.findIndex(
+    (p: { name?: string }) => p.name === 'storycap-fullpage-stitch-fix',
+  )
+  if (fullPageStitchIndex < storycapIndex) {
+    // eslint-disable-next-line no-restricted-syntax -- config-load-time invariant check, mirrors storycapNetworkIdle's fail-fast pattern above
+    throw new Error(
+      'storycapFullPageStitch must be registered after storycap in the plugins array for its __storycap_takeScreenshot override to take effect',
+    )
+  }
+
   // storybookTest() below returns a Promise that starts loading a real
   // Storybook config from `configDir` as soon as it's constructed — nothing
   // but Vite's own plugin container ever awaits that Promise, so calling
@@ -114,22 +147,7 @@ export function createStorybookProject({
   // surfaces it as an unhandled rejection instead of a useful assertion.
   // This branch is covered by running against a real Storybook config instead.
   return {
-    plugins: [
-      storycapNetworkIdle,
-      storybookTest({
-        configDir,
-        tags: { exclude: excludeTags },
-      }),
-      asPlugin(
-        storycap({
-          viewport,
-          output: { dir: screenshotsDir },
-        }),
-      ),
-      // Must come after `storycap` above — see storycapFullPageStitch's own
-      // comment for why plugin order is what makes this an override.
-      storycapFullPageStitch({ viewport }),
-    ],
+    plugins,
     test: {
       name,
       ...(maxWorkers !== undefined && { maxWorkers }),
