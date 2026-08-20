@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/fohte/storybook-addon/compare/v0.1.3...v0.1.4) (2026-08-20)
+
+
+### Bug Fixes
+
+* **vitest-plugin:** correct storycap fullPage screenshot tiling ([#30](https://github.com/fohte/storybook-addon/issues/30)) ([ee11bab](https://github.com/fohte/storybook-addon/commit/ee11bab83e3de55da58a46736fb5bd60abd5ad76))
+
 ## [0.1.3](https://github.com/fohte/storybook-addon/compare/v0.1.2...v0.1.3) (2026-08-19)
 
 
