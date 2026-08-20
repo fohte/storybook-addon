@@ -79,6 +79,21 @@ describe('unhandledApiRequestCheck', () => {
       unhandledApiRequestCheck.assert()
     }).not.toThrow()
   })
+
+  it('discards fetches left pending from a previous story on reset, so they do not delay the next story', async () => {
+    fetchImpl = () => new Promise(() => {}) // never resolves
+    configureUnhandledApiRequestCheck({ pathPrefixes: ['/api/'] })
+    void fetch(`${window.location.origin}/api/tasks`)
+
+    unhandledApiRequestCheck.reset()
+
+    let settled = false
+    void waitForPendingApiRequests().then(() => {
+      settled = true
+    })
+    await Promise.resolve()
+    expect(settled).toBe(true)
+  })
 })
 
 describe('waitForPendingApiRequests', () => {
@@ -113,19 +128,74 @@ describe('waitForPendingApiRequests', () => {
     expect(settled).toBe(true)
   })
 
+  it('waits for a follow-up tracked fetch triggered while an earlier one settles', async () => {
+    let resolveFirst: (() => void) | undefined
+    let resolveSecond: (() => void) | undefined
+    let fetchCalls = 0
+    fetchImpl = () => {
+      fetchCalls += 1
+      if (fetchCalls === 1) {
+        return new Promise((resolve) => {
+          resolveFirst = () => {
+            resolve(new Response())
+          }
+        })
+      }
+      return new Promise((resolve) => {
+        resolveSecond = () => {
+          resolve(new Response())
+        }
+      })
+    }
+    configureUnhandledApiRequestCheck({ pathPrefixes: ['/api/'] })
+
+    void fetch(`${window.location.origin}/api/user`).then(() =>
+      fetch(`${window.location.origin}/api/user/posts`),
+    )
+
+    let settled = false
+    const waiting = waitForPendingApiRequests().then(() => {
+      settled = true
+    })
+
+    resolveFirst?.()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(resolveSecond).toBeDefined()
+    expect(settled).toBe(false)
+
+    resolveSecond?.()
+    await waiting
+    expect(settled).toBe(true)
+  })
+
   it('ignores a fetch whose URL does not match a configured prefix', async () => {
+    // Never resolves: a fetch that's (incorrectly) tracked would still let
+    // waitForPendingApiRequests() resolve eventually via the timeout, so
+    // resolving alone can't tell "ignored" apart from "tracked but slow".
     fetchImpl = () => new Promise(() => {})
     configureUnhandledApiRequestCheck({ pathPrefixes: ['/api/'] })
 
     void fetch(`${window.location.origin}/assets/logo.png`)
 
-    await expect(waitForPendingApiRequests()).resolves.toBeUndefined()
+    let settled = false
+    void waitForPendingApiRequests().then(() => {
+      settled = true
+    })
+
+    await Promise.resolve()
+    expect(settled).toBe(true)
   })
 
   it('gives up waiting once a pending tracked fetch exceeds the timeout', async () => {
     vi.useFakeTimers()
+    let resolveFetch: (() => void) | undefined
     try {
-      fetchImpl = () => new Promise(() => {})
+      fetchImpl = () =>
+        new Promise((resolve) => {
+          resolveFetch = () => {
+            resolve(new Response())
+          }
+        })
       configureUnhandledApiRequestCheck({ pathPrefixes: ['/api/'] })
 
       void fetch(`${window.location.origin}/api/tasks`)
@@ -139,6 +209,10 @@ describe('waitForPendingApiRequests', () => {
       await waiting
       expect(settled).toBe(true)
     } finally {
+      // Left pending, the fetch tracker never removes it from
+      // pendingFetches, which would force every later test's fetch wait in
+      // this file down the same timeout path.
+      resolveFetch?.()
       vi.useRealTimers()
     }
   })
