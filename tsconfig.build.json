@@ -4,6 +4,7 @@
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "noEmit": false,
+    "allowImportingTsExtensions": false,
     "outDir": "./lib",
     "rootDir": "./src",
     "declaration": true,
