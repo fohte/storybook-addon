@@ -4,6 +4,10 @@ import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 import storycap from '@storycap-testrun/browser/vitest-plugin'
 import { playwright } from '@vitest/browser-playwright'
 
+import { storycapFullPageStitch } from '#storycap-fullpage-stitch.js'
+
+export { storycapFullPageStitch } from '#storycap-fullpage-stitch.js'
+
 // @storycap-testrun/browser ships a bundled .d.ts with its own copy of vite's
 // `Plugin` type, so it's structurally identical but nominally unrelated to
 // ours — cast to sidestep the resulting "unrelated types" error. Typing this
@@ -122,6 +126,9 @@ export function createStorybookProject({
           output: { dir: screenshotsDir },
         }),
       ),
+      // Must come after `storycap` above — see storycapFullPageStitch's own
+      // comment for why plugin order is what makes this an override.
+      storycapFullPageStitch({ viewport }),
     ],
     test: {
       name,
