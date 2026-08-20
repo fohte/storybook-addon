@@ -156,7 +156,17 @@ export function createStorybookProject({
         // Pin the browser's timezone so time-dependent stories (calendar
         // "now" indicators, relative timestamps) render identically
         // regardless of the host machine's local timezone.
-        provider: playwright({ contextOptions: { timezoneId: 'Asia/Tokyo' } }),
+        //
+        // `viewport` must match the story `viewport` above: Vitest's own
+        // iframe sizing (`__storycap_prepareViewport`) only resizes the
+        // iframe's wrapper div via CSS, it never touches the Playwright
+        // page's own viewport, which otherwise stays at Chromium's 1280x720
+        // default. `page.screenshot({ clip })` clips to the page's actual
+        // viewport regardless of the CSS layout, so a shorter page viewport
+        // silently truncates every fullPage tile's clip rect below it.
+        provider: playwright({
+          contextOptions: { timezoneId: 'Asia/Tokyo', viewport },
+        }),
         headless: true,
         instances: [{ browser: 'chromium' as const }],
       },
