@@ -8,7 +8,10 @@ import type {
 import type { StorybookCheck } from '#checks/check.js'
 import { externalResourceCheck } from '#checks/external-resource-check.js'
 import { overflowCheck } from '#checks/overflow-check.js'
-import { unhandledApiRequestCheck } from '#checks/unhandled-api-request-check.js'
+import {
+  unhandledApiRequestCheck,
+  waitForPendingApiRequests,
+} from '#checks/unhandled-api-request-check.js'
 
 export {
   configureUnhandledApiRequestCheck,
@@ -56,7 +59,12 @@ export const beforeEach: BeforeEach<WebRenderer> = () => {
   for (const check of checks) check.reset()
 }
 
-export const afterEach: AfterEach<WebRenderer> = (context) => {
+export const afterEach: AfterEach<WebRenderer> = async (context) => {
+  // A story with no play function only has its render awaited before
+  // afterEach runs (see storybook/dist/preview/runtime.js's runStory()), so
+  // a fire-and-forget fetch() from a mount-time effect can still be in
+  // flight here — wait for it before the checks read their state.
+  await waitForPendingApiRequests()
   for (const check of checks) {
     check.assert(context.parameters, context.canvasElement)
   }
