@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from '@storybook/html-vite'
 import { expect } from 'storybook/test'
 import { commands } from 'vitest/browser'
 
+import { findTransparentRows } from '#find-transparent-rows.js'
+
 declare module 'vitest/browser' {
   interface BrowserCommands {
     __storycap_takeScreenshot: (
@@ -14,9 +16,7 @@ declare module 'vitest/browser' {
 
 // Not a multiple of the 800px viewport height the storybook-fixture project
 // (vitest.config.ts) configures, so capturing it always needs more than one
-// screenshot tile stitched together — the path that clipped a fixed 80px off
-// the bottom of every tile before src/vitest-plugin.ts pinned the Playwright
-// context's own viewport to match.
+// screenshot tile stitched together, exercising the fullPage tiling/clip path.
 const CONTENT_HEIGHT = 1990
 
 function renderTallContent(): HTMLElement {
@@ -58,22 +58,13 @@ async function decodeScreenshot(base64Png: string): Promise<{
   ctx.drawImage(img, 0, 0)
   const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height)
 
-  const transparentRows: number[] = []
-  for (let y = 0; y < canvas.height; y++) {
-    let hasOpaquePixel = false
-    for (let x = 0; x < canvas.width; x++) {
-      if (data[(y * canvas.width + x) * 4 + 3] !== 0) {
-        hasOpaquePixel = true
-        break
-      }
-    }
-    if (!hasOpaquePixel) transparentRows.push(y)
+  return {
+    height: canvas.height,
+    transparentRows: findTransparentRows(data, canvas.width, canvas.height),
   }
-
-  return { height: canvas.height, transparentRows }
 }
 
-export const TallerThanViewport: Story = {
+export const CapturesFullPageWithoutClipping: Story = {
   play: async () => {
     // storycap's own afterEach hook (see .storybook/vitest.setup.ts) runs
     // __storycap_prepareViewport before capturing; calling

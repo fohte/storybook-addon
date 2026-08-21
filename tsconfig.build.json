@@ -12,5 +12,10 @@
     "sourceMap": true
   },
   "include": ["./src/**/*"],
-  "exclude": ["**/*.cjs", "**/*.test.ts", "**/test-helpers.ts"]
+  "exclude": [
+    "**/*.cjs",
+    "**/*.test.ts",
+    "**/test-helpers.ts",
+    "src/__fixtures__/**"
+  ]
 }
