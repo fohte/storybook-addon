@@ -150,7 +150,14 @@ export function createStorybookProject({
     plugins,
     test: {
       name,
-      ...(maxWorkers !== undefined && { maxWorkers }),
+      ...(maxWorkers !== undefined && {
+        maxWorkers,
+        // Vitest requires distinct `sequence.groupOrder` for same-group
+        // projects with different `maxWorkers`, and a consumer's sibling
+        // project (e.g. a plain "unit" project) won't have `maxWorkers`
+        // set — so this project needs its own group whenever it sets one.
+        sequence: { groupOrder: 1 },
+      }),
       browser: {
         enabled: true,
         // Pin the browser's timezone so time-dependent stories (calendar
