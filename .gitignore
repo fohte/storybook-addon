@@ -51,6 +51,9 @@ web_modules/
 # Build output
 lib
 
+# Screenshots produced by the storybook-fixture vitest project (vitest.config.ts)
+__screenshots__
+
 # Optional npm cache directory
 .npm
 
