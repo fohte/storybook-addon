@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.5](https://github.com/fohte/storybook-addon/compare/v0.1.4...v0.1.5) (2026-08-21)
+
+
+### Bug Fixes
+
+* **unhandled-api-request-check:** detect fire-and-forget fetches in stories without a play function ([#33](https://github.com/fohte/storybook-addon/issues/33)) ([3280e17](https://github.com/fohte/storybook-addon/commit/3280e17d70f56225ff9627002fc82368edfaa544))
+* **vitest-plugin:** pin the Playwright context viewport to the story viewport ([#35](https://github.com/fohte/storybook-addon/issues/35)) ([43b5082](https://github.com/fohte/storybook-addon/commit/43b5082e68db8eea543975d6b96c6ed337104e22))
+
 ## [0.1.4](https://github.com/fohte/storybook-addon/compare/v0.1.3...v0.1.4) (2026-08-20)
 
 
