@@ -34,8 +34,8 @@ importers:
         specifier: 2.1.1
         version: 2.1.1(@vitest/browser-playwright@4.1.10)
       '@tsconfig/node-lts':
-        specifier: 24.0.0
-        version: 24.0.0
+        specifier: 24.0.1
+        version: 24.0.1
       '@tsconfig/strictest':
         specifier: 2.0.8
         version: 2.0.8
@@ -49,8 +49,8 @@ importers:
         specifier: 4.1.10
         version: 4.1.10(playwright@1.62.1)(vite@8.2.1(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.6.1))(vitest@4.1.10)
       concurrently:
-        specifier: 10.0.4
-        version: 10.0.4
+        specifier: 10.0.5
+        version: 10.0.5
       eslint:
         specifier: 10.6.0
         version: 10.6.0(jiti@2.6.1)(supports-color@10.2.2)
@@ -961,8 +961,8 @@ packages:
     peerDependencies:
       '@testing-library/dom': '>=7.21.4'
 
-  '@tsconfig/node-lts@24.0.0':
-    resolution: {integrity: sha512-8mSTqWwCd6aQpvxSrpQlMoA9RiUZSs7bYhL5qsLXIIaN9HQaINeoydrRu/Y7/fws4bvfuyhs0BRnW9/NI8tySg==}
+  '@tsconfig/node-lts@24.0.1':
+    resolution: {integrity: sha512-xo+1KtV5zVb90fyyeglG1n5cqg3cQXLlCkEpLptYlZUNk28xmwhuD5GmxoXwmrVtUTvaMyclun9kAd0TK7H+Pg==}
 
   '@tsconfig/strictest@2.0.8':
     resolution: {integrity: sha512-XnQ7vNz5HRN0r88GYf1J9JJjqtZPiHt2woGJOo2dYqyHGGcd6OLGqSlBB6p1j9mpzja6Oe5BoPqWmeDx6X9rLw==}
@@ -1353,8 +1353,8 @@ packages:
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
-  concurrently@10.0.4:
-    resolution: {integrity: sha512-trZql+7l/0+WRAsAnEdctr4+iiOS6ZrViI6H8QWcCF9MFS/LT0dKpe8vluB1to6it+OxSI4VospFTIFMW8DJRw==}
+  concurrently@10.0.5:
+    resolution: {integrity: sha512-JaP/CoftUrCcAFW/g//RbgEGwlelnEae6cfBLgH6ZdO6s8jPkn6p9SB9u6pdVxYXoiSnFqseOlHfrEfF82TVOg==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -3107,7 +3107,7 @@ snapshots:
     dependencies:
       '@testing-library/dom': 10.4.1
 
-  '@tsconfig/node-lts@24.0.0': {}
+  '@tsconfig/node-lts@24.0.1': {}
 
   '@tsconfig/strictest@2.0.8': {}
 
@@ -3503,7 +3503,7 @@ snapshots:
 
   concat-map@0.0.1: {}
 
-  concurrently@10.0.4:
+  concurrently@10.0.5:
     dependencies:
       chalk: 5.6.2
       rxjs: 7.8.2
