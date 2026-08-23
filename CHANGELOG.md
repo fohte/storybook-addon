@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.7](https://github.com/fohte/storybook-addon/compare/v0.1.6...v0.1.7) (2026-08-23)
+
+
+### Bug Fixes
+
+* use `performance.now()` for pending-fetch wait deadline ([#42](https://github.com/fohte/storybook-addon/issues/42)) ([96d4bdf](https://github.com/fohte/storybook-addon/commit/96d4bdfa7e11f03f4bf39dde664f193cd25f0978))
+
 ## [0.1.6](https://github.com/fohte/storybook-addon/compare/v0.1.5...v0.1.6) (2026-08-23)
 
 
