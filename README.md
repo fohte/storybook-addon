@@ -78,6 +78,8 @@ initialize({
 
 Builds a Vitest browser-mode project that runs Storybook stories through [`@storybook/addon-vitest`](https://storybook.js.org/docs/writing-tests/integrations/vitest-addon) and captures a screenshot of each with [`@storycap-testrun/browser`](https://github.com/reg-viz/storycap-testrun), patched to shorten storycap's hardcoded 500ms network-idle wait to 100ms and to fix a tiling bug in its fullPage capture (`clip` staying anchored to the top of the viewport instead of following the browser's clamped scroll position, which duplicated content and cut off the bottom of any story taller than the viewport).
 
+`viewport` applies for the whole test, not just the screenshot: mount and `play()` render at it too. `@storybook/addon-vitest` would otherwise silently mount/run every story at its own fixed 1200x900 default instead.
+
 ```ts
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
