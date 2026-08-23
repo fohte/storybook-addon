@@ -186,7 +186,7 @@ describe('waitForPendingApiRequests', () => {
     expect(settled).toBe(true)
   })
 
-  it('gives up waiting once a pending tracked fetch exceeds the timeout even when vi.setSystemTime() froze Date without vi.useFakeTimers()', async () => {
+  it('still gives up on the pending-fetch timeout when vi.setSystemTime() froze Date without vi.useFakeTimers()', async () => {
     // vi.setSystemTime() alone (no vi.useFakeTimers()) only freezes Date, not
     // setTimeout — a consuming app's VRT setup does exactly this to pin
     // screenshots to a fixed date. A deadline computed from Date.now() would
@@ -210,6 +210,10 @@ describe('waitForPendingApiRequests', () => {
         settled = true
       })
 
+      // No fake timers are installed in this test (that's the scenario under
+      // test), so this genuinely waits out the real ~2s deadline instead of
+      // fast-forwarding it — stubbing performance.now() here would mock away
+      // the exact thing this test exists to prove stays real.
       await waiting
       expect(settled).toBe(true)
     } finally {
