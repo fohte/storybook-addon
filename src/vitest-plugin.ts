@@ -1,4 +1,5 @@
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 import storycap from '@storycap-testrun/browser/vitest-plugin'
@@ -106,6 +107,9 @@ export function createStorybookProject({
     screenshotsSubdir,
   )
   const maxWorkers = process.env['CI'] != null ? ciMaxWorkers : undefined
+  const viewportSetupFile = fileURLToPath(
+    import.meta.resolve('#vitest-viewport-setup.js'),
+  )
 
   const plugins = [
     storycapNetworkIdle,
@@ -177,7 +181,17 @@ export function createStorybookProject({
         headless: true,
         instances: [{ browser: 'chromium' as const }],
       },
-      setupFiles,
+      // @storybook/addon-vitest overrides the story viewport to its own
+      // 1200x900 default right before mount/play() unless
+      // parameters.viewport/globals.viewport are set — vitest-viewport-setup.ts
+      // sets them via setProjectAnnotations() so mount/play() see the same
+      // `viewport` as the Playwright page and the screenshot above. It must
+      // run after the consumer's own setupFiles in case any of them also
+      // call setProjectAnnotations().
+      setupFiles: [...setupFiles, viewportSetupFile],
+      provide: {
+        fohteStorybookAddonViewport: viewport,
+      },
     },
   }
 }
