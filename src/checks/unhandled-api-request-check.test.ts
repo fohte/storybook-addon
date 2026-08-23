@@ -186,6 +186,41 @@ describe('waitForPendingApiRequests', () => {
     expect(settled).toBe(true)
   })
 
+  it('gives up waiting once a pending tracked fetch exceeds the timeout even when vi.setSystemTime() froze Date without vi.useFakeTimers()', async () => {
+    // vi.setSystemTime() alone (no vi.useFakeTimers()) only freezes Date, not
+    // setTimeout — a consuming app's VRT setup does exactly this to pin
+    // screenshots to a fixed date. A deadline computed from Date.now() would
+    // never elapse under this combination, hanging until the outer test
+    // runner's own timeout kills it.
+    vi.setSystemTime(new Date('2026-01-01T00:00:00Z'))
+    let resolveFetch: (() => void) | undefined
+    try {
+      fetchImpl = () =>
+        new Promise((resolve) => {
+          resolveFetch = () => {
+            resolve(new Response())
+          }
+        })
+      configureUnhandledApiRequestCheck({ pathPrefixes: ['/api/'] })
+
+      void fetch(`${window.location.origin}/api/tasks`)
+
+      let settled = false
+      const waiting = waitForPendingApiRequests().then(() => {
+        settled = true
+      })
+
+      await waiting
+      expect(settled).toBe(true)
+    } finally {
+      // Left pending, the fetch tracker never removes it from
+      // pendingFetches, which would force every later test's fetch wait in
+      // this file down the same timeout path.
+      resolveFetch?.()
+      vi.useRealTimers()
+    }
+  })
+
   it('gives up waiting once a pending tracked fetch exceeds the timeout', async () => {
     vi.useFakeTimers()
     let resolveFetch: (() => void) | undefined

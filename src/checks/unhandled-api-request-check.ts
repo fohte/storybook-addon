@@ -111,18 +111,25 @@ const PENDING_FETCH_TIMEOUT_MS = 2000
 // every other check.
 export async function waitForPendingApiRequests(): Promise<void> {
   const { pendingFetches } = globalState()
-  const deadline = Date.now() + PENDING_FETCH_TIMEOUT_MS
+  // performance.now(), not Date.now(): a consuming app's test setup may call
+  // vi.setSystemTime() without vi.useFakeTimers() (e.g. to pin screenshots to
+  // a fixed date), which freezes Date.now() while leaving setTimeout on the
+  // real clock — Date.now() < deadline would then stay true forever and this
+  // loop would never exit on its own.
+  const deadline = performance.now() + PENDING_FETCH_TIMEOUT_MS
   // A tracked fetch's own resolution can synchronously trigger another
   // tracked fetch (e.g. fetch(user).then(() => fetch(user.posts))) — re-check
   // pendingFetches after each round instead of racing a single snapshot of
   // it, so a same-story follow-up fetch is also waited for, within the same
   // overall deadline.
-  while (pendingFetches.size > 0 && Date.now() < deadline) {
+  while (pendingFetches.size > 0 && performance.now() < deadline) {
     // Each iteration re-reads pendingFetches, which the previous iteration's
     // wait may have grown, so this can't be hoisted out of the loop.
     await Promise.race([
       Promise.all(pendingFetches),
-      new Promise((resolve) => setTimeout(resolve, deadline - Date.now())),
+      new Promise((resolve) =>
+        setTimeout(resolve, deadline - performance.now()),
+      ),
     ])
   }
   if (pendingFetches.size > 0) {
