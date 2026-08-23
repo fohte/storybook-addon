@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -110,6 +111,18 @@ export function createStorybookProject({
   const viewportSetupFile = fileURLToPath(
     import.meta.resolve('#vitest-viewport-setup.js'),
   )
+  // `import.meta.resolve` maps `#*.js` straight to `./lib/*.js` (this
+  // package's own build output) without checking the file exists — running
+  // against a fresh clone or a stale `lib/` (before `pnpm run build`, or
+  // after editing vitest-viewport-setup.ts without rebuilding) would
+  // otherwise leave Vitest to fail on a missing/stale setupFile with no clue
+  // this is why.
+  if (!existsSync(viewportSetupFile)) {
+    // eslint-disable-next-line no-restricted-syntax -- config-load-time invariant check, mirrors storycapNetworkIdle's fail-fast pattern above
+    throw new Error(
+      `createStorybookProject: ${viewportSetupFile} not found. Run \`pnpm run build\` first.`,
+    )
+  }
 
   const plugins = [
     storycapNetworkIdle,
