@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/fohte/storybook-addon/compare/v0.1.5...v0.1.6) (2026-08-23)
+
+
+### Bug Fixes
+
+* **vitest-plugin:** apply viewport to story mount and play() ([#40](https://github.com/fohte/storybook-addon/issues/40)) ([1ed7784](https://github.com/fohte/storybook-addon/commit/1ed7784dd04289f95d04ab88f379b57801883e2c))
+
 ## [0.1.5](https://github.com/fohte/storybook-addon/compare/v0.1.4...v0.1.5) (2026-08-21)
 
 
