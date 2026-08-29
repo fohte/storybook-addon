@@ -191,8 +191,6 @@ describe('overflowCheck', () => {
     )
   })
 
-  // Under layout: 'centered', canvasElement is a flex item and never
-  // self-overflows — only findViewportOverflow can catch this.
   it('fails when the document overflows the viewport, even though canvasElement itself does not self-overflow', () => {
     const root = mountStoryRoot()
     mockViewport({ scrollWidth: 800, innerWidth: 375 })
