@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.8](https://github.com/fohte/storybook-addon/compare/v0.1.7...v0.1.8) (2026-08-29)
+
+
+### Features
+
+* **overflow-check:** detect viewport overflow ([#62](https://github.com/fohte/storybook-addon/issues/62)) ([4d1ec5e](https://github.com/fohte/storybook-addon/commit/4d1ec5ef11f75dbe2e89f76f996a1e952df3ba07))
+
 ## [0.1.7](https://github.com/fohte/storybook-addon/compare/v0.1.6...v0.1.7) (2026-08-23)
 
 
