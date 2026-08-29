@@ -91,6 +91,25 @@ function findOverflows(root: Element, ignoreSelectors: string[]): string[] {
   return groupByAncestor(entries)
 }
 
+// `findOverflows` only scans canvasElement's descendants, so it can never
+// catch canvasElement itself (or anything above it) overflowing. That gap is
+// reachable in practice: Storybook's `layout: 'centered'` makes canvasElement
+// a flex item (base-preview-head.html's `.sb-main-centered { display: flex }`),
+// and a flex item's automatic minimum size keeps it from shrinking below its
+// own content width — so a fixed-width story never self-overflows there, and
+// the clip only ever shows up on `document.documentElement`, above
+// canvasElement. Comparing that against `window.innerWidth` catches it
+// regardless of layout mode: under `layout: 'padded'`/`'fullscreen'`,
+// canvasElement already self-overflows too, so this is redundant with
+// `findOverflows` there rather than a replacement for it.
+function findViewportOverflow(): string[] {
+  const overflowPx = document.documentElement.scrollWidth - window.innerWidth
+  if (overflowPx <= 0) return []
+  return [
+    `document.documentElement.scrollWidth=${String(document.documentElement.scrollWidth)} is ${String(overflowPx)}px wider than window.innerWidth=${String(window.innerWidth)}. This usually means the story's own wrapper uses a fixed width (e.g. Tailwind's \`w-*\`) instead of a max-width (\`max-w-*\`).`,
+  ]
+}
+
 function overflowCheckParameters(storyParameters: unknown): object | undefined {
   if (typeof storyParameters !== 'object' || storyParameters === null) {
     return undefined
@@ -163,6 +182,11 @@ export const overflowCheck: StorybookCheck = {
         ...ignoreSelectorsOf(params),
       ]),
       'Story has element(s) overflowing their container (clipped and invisible)',
+    )
+
+    throwIfNotEmpty(
+      findViewportOverflow(),
+      'Story overflows the viewport itself (not just an inner element)',
     )
   },
 }

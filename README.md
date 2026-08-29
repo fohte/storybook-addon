@@ -4,7 +4,7 @@
 
 Runs three checks right after each story renders, and fails the story's test when one trips:
 
-- **overflow-check** — flags elements whose content is clipped by their container (scrollWidth > clientWidth), which usually means a silent layout bug.
+- **overflow-check** — flags elements whose content is clipped by their container (scrollWidth > clientWidth), or the story's own root overflowing the viewport itself, which usually means a silent layout bug.
 - **external-resource-check** — flags stories that load a non-same-origin resource (font, image, stylesheet), which makes VRT captures non-deterministic.
 - **unhandled-api-request-check** — flags stories that hit an API endpoint with no MSW handler, which would otherwise render with MSW's error response instead of failing.
 
@@ -41,6 +41,10 @@ export default config
 This wires up `overflow-check` and `external-resource-check` — no further setup needed.
 
 ### overflow-check
+
+Besides scanning canvasElement's descendants, this check also compares `document.documentElement.scrollWidth` against `window.innerWidth`, catching canvasElement itself (or anything above it) overflowing the viewport — which the descendant scan can never see under `layout: 'centered'`, since a flex item's automatic minimum size keeps a fixed-width story from self-overflowing there. This is on by default alongside the descendant scan; `parameters.overflowCheck.disable` turns off both.
+
+`ignoreSelectors`/`globalIgnoreSelectors` below only filter the descendant scan, not the viewport check — the viewport check has no selector-level exemption and can only be turned off entirely via `disable`.
 
 To exempt a selector across every story (e.g. a component whose oversized hit target never visibly clips anything), set `parameters.overflowCheck.globalIgnoreSelectors` once in `.storybook/preview.ts`. It's additive with a story's own `parameters.overflowCheck.ignoreSelectors` — both apply, since they're separate keys and Storybook deep-merges parameter objects by key (only arrays at the same key replace wholesale, so a story-level `ignoreSelectors` can't drop the global list):
 
