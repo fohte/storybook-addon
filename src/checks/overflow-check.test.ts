@@ -191,12 +191,8 @@ describe('overflowCheck', () => {
     )
   })
 
-  // Under layout: 'centered', a fixed-width wrapper never shrinks below its
-  // own content width (it's a flex item), so canvasElement itself passes
-  // findOverflows's descendant scan clean — only document.documentElement,
-  // above canvasElement, shows the clip. No descendant is appended below, so
-  // findOverflows already finds nothing on its own; only findViewportOverflow
-  // can fail this test.
+  // Under layout: 'centered', canvasElement is a flex item and never
+  // self-overflows — only findViewportOverflow can catch this.
   it('fails when the document overflows the viewport, even though canvasElement itself does not self-overflow', () => {
     const root = mountStoryRoot()
     mockViewport({ scrollWidth: 800, innerWidth: 375 })
