@@ -27,8 +27,23 @@ function mountStoryRoot(): HTMLElement {
   return root
 }
 
+function mockViewport(size: { scrollWidth: number; innerWidth: number }): void {
+  Object.defineProperty(document.documentElement, 'scrollWidth', {
+    value: size.scrollWidth,
+    configurable: true,
+  })
+  Object.defineProperty(window, 'innerWidth', {
+    value: size.innerWidth,
+    configurable: true,
+  })
+}
+
 afterEach(() => {
   document.body.replaceChildren()
+  // jsdom's real defaults (innerWidth=1024, documentElement.scrollWidth=0
+  // since jsdom never runs layout), so viewport-overflow tests can't leak
+  // into unrelated tests that never call mockViewport().
+  mockViewport({ scrollWidth: 0, innerWidth: 1024 })
 })
 
 describe('overflowCheck', () => {
@@ -174,5 +189,37 @@ describe('overflowCheck', () => {
         '  div#parent: scrollWidth=200 > clientWidth=100 (+100px)\n' +
         '  span#child: scrollWidth=150 > clientWidth=100 (+50px)',
     )
+  })
+
+  it('fails when the document overflows the viewport, even though canvasElement itself does not self-overflow', () => {
+    const root = mountStoryRoot()
+    mockViewport({ scrollWidth: 800, innerWidth: 375 })
+
+    expect(
+      messageOf(() => {
+        overflowCheck.assert(undefined, root)
+      }),
+    ).toEqual(
+      'Story overflows the viewport itself (not just an inner element):\n' +
+        "document.documentElement.scrollWidth=800 is 425px wider than window.innerWidth=375. This usually means the story's own wrapper uses a fixed width (e.g. Tailwind's `w-*`) instead of a max-width (`max-w-*`).",
+    )
+  })
+
+  it('passes when the document does not overflow the viewport', () => {
+    const root = mountStoryRoot()
+    mockViewport({ scrollWidth: 375, innerWidth: 375 })
+
+    expect(() => {
+      overflowCheck.assert(undefined, root)
+    }).not.toThrow()
+  })
+
+  it('skips the viewport check when parameters.overflowCheck.disable is true', () => {
+    const root = mountStoryRoot()
+    mockViewport({ scrollWidth: 800, innerWidth: 375 })
+
+    expect(() => {
+      overflowCheck.assert({ overflowCheck: { disable: true } }, root)
+    }).not.toThrow()
   })
 })

@@ -91,6 +91,18 @@ function findOverflows(root: Element, ignoreSelectors: string[]): string[] {
   return groupByAncestor(entries)
 }
 
+// `findOverflows` never sees canvasElement itself overflowing. Under
+// `layout: 'centered'`, canvasElement is a flex item that never shrinks
+// below its own content width, so the clip only shows up on
+// `document.documentElement`, above canvasElement.
+function findViewportOverflow(): string[] {
+  const overflowPx = document.documentElement.scrollWidth - window.innerWidth
+  if (overflowPx <= 0) return []
+  return [
+    `document.documentElement.scrollWidth=${String(document.documentElement.scrollWidth)} is ${String(overflowPx)}px wider than window.innerWidth=${String(window.innerWidth)}. This usually means the story's own wrapper uses a fixed width (e.g. Tailwind's \`w-*\`) instead of a max-width (\`max-w-*\`).`,
+  ]
+}
+
 function overflowCheckParameters(storyParameters: unknown): object | undefined {
   if (typeof storyParameters !== 'object' || storyParameters === null) {
     return undefined
@@ -163,6 +175,11 @@ export const overflowCheck: StorybookCheck = {
         ...ignoreSelectorsOf(params),
       ]),
       'Story has element(s) overflowing their container (clipped and invisible)',
+    )
+
+    throwIfNotEmpty(
+      findViewportOverflow(),
+      'Story overflows the viewport itself (not just an inner element)',
     )
   },
 }
