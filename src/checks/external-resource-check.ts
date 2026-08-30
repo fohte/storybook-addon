@@ -20,9 +20,22 @@ function isExternalResourceUrl(url: string): boolean {
   )
 }
 
+function isPerformanceResourceTiming(
+  entry: PerformanceEntry,
+): entry is PerformanceResourceTiming {
+  return entry.entryType === 'resource'
+}
+
 new PerformanceObserver((list) => {
   for (const entry of list.getEntries()) {
-    if (entry.startTime >= resetAt && isExternalResourceUrl(entry.name)) {
+    if (!isPerformanceResourceTiming(entry)) continue
+    // Resource timing entries are queued when the request completes, not
+    // when it starts, so a request that outlives its story's render phase
+    // must be judged by its completion time (responseEnd, always exposed
+    // even cross-origin: https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming/responseEnd).
+    // Filtering on startTime instead would drop it forever once resetAt
+    // advances past its (early) start time.
+    if (entry.responseEnd >= resetAt && isExternalResourceUrl(entry.name)) {
       externalResourceUrls.push(entry.name)
     }
   }
