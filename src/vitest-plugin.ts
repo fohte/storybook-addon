@@ -61,6 +61,16 @@ export const storycapNetworkIdle = {
   },
 }
 
+// Blocks every network request except to `localhost`, where Vitest's own dev
+// server runs (`resolvedUrls.local[0]`) — keeps a story from depending on an
+// external CDN request completing before the story's `afterEach` runs, which
+// otherwise makes checks like overflow-check flaky on request timing.
+// Playwright's own CDP control connection is unaffected: a locally launched
+// browser always uses `--remote-debugging-pipe`, not DNS.
+export const BLOCK_EXTERNAL_REQUESTS_ARGS = [
+  '--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE localhost',
+]
+
 export interface CreateStorybookProjectOptions {
   /** Project name, as shown by `vitest --project <name>`. */
   name: string
@@ -190,6 +200,7 @@ export function createStorybookProject({
         // silently truncates every fullPage tile's clip rect below it.
         provider: playwright({
           contextOptions: { timezoneId: 'Asia/Tokyo', viewport },
+          launchOptions: { args: BLOCK_EXTERNAL_REQUESTS_ARGS },
         }),
         headless: true,
         instances: [{ browser: 'chromium' as const }],

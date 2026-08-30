@@ -112,6 +112,17 @@ Screenshots for a project land in `<rootDir>/__screenshots__/<screenshotsSubdir>
 
 `storycapNetworkIdle` and `storycapFullPageStitch` are also exported on their own, for building a project without `createStorybookProject`. `storycapFullPageStitch` must be placed after storycap's own plugin in the `plugins` array — it works by overriding the `__storycap_takeScreenshot` command storycap registers, and Vite resolves conflicting plugin `config()` keys in plugin order, later wins.
 
+`createStorybookProject` blocks non-`localhost` network requests in the browser by passing `BLOCK_EXTERNAL_REQUESTS_ARGS` to `playwright()`'s `launchOptions.args`, so a story can't depend on an external CDN request completing before the test's `afterEach` runs. If you build your `playwright()` call by hand instead of using `createStorybookProject`, spread this in yourself:
+
+```ts
+import { BLOCK_EXTERNAL_REQUESTS_ARGS } from '@fohte/storybook-addon/vitest-plugin'
+import { playwright } from '@vitest/browser-playwright'
+
+playwright({
+  launchOptions: { args: [...BLOCK_EXTERNAL_REQUESTS_ARGS] },
+})
+```
+
 Your `setupFiles` entry needs an `afterEach` that calls storycap's own `screenshot()` — see [`@storycap-testrun/browser`'s "Setup Screenshot Capture"](https://github.com/reg-viz/storycap-testrun/tree/main/packages/browser#2-setup-screenshot-capture) for the exact shape. Don't call `setProjectAnnotations()` there, and don't even mention that identifier in a comment: `@storybook/addon-vitest` decides whether to inject this package's checks by a plain substring search over the setup file's source text, so its mere presence silently disables every check in the project, with no error.
 
 ### Check failures don't block the screenshot
