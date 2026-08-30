@@ -87,9 +87,6 @@ describe('externalResourceCheck', () => {
   })
 
   it('records an entry that started before reset but completed after it', () => {
-    // Resource timing entries are queued at completion time, so a request
-    // still in flight when the story boundary resets must still be caught
-    // once it finally completes.
     emit([{ name: 'https://cdn.example.test/font.woff2', startTime: 0 }])
 
     expect(
