@@ -112,7 +112,7 @@ Screenshots for a project land in `<rootDir>/__screenshots__/<screenshotsSubdir>
 
 `storycapNetworkIdle` and `storycapFullPageStitch` are also exported on their own, for building a project without `createStorybookProject`. `storycapFullPageStitch` must be placed after storycap's own plugin in the `plugins` array — it works by overriding the `__storycap_takeScreenshot` command storycap registers, and Vite resolves conflicting plugin `config()` keys in plugin order, later wins.
 
-`createStorybookProject` blocks non-`localhost` network requests in the browser by passing `BLOCK_EXTERNAL_REQUESTS_ARGS` to `playwright()`'s `launchOptions.args`, so a story can't depend on an external CDN request completing before the test's `afterEach` runs. If you build your `playwright()` call by hand instead of using `createStorybookProject`, spread this in yourself:
+`createStorybookProject` blocks non-`localhost` network requests in the browser by passing `BLOCK_EXTERNAL_REQUESTS_ARGS` to `playwright()`'s `launchOptions.args`, so a story can't depend on an external CDN request completing before the test's `afterEach` runs. It's a Chromium-only launch flag (matching `createStorybookProject`'s own `instances: [{ browser: 'chromium' }]`) — a `firefox`/`webkit` instance would silently get no blocking at all. If you build your `playwright()` call by hand instead of using `createStorybookProject`, spread this in yourself:
 
 ```ts
 import { BLOCK_EXTERNAL_REQUESTS_ARGS } from '@fohte/storybook-addon/vitest-plugin'
