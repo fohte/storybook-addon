@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/fohte/storybook-addon.git"
   },
-  "packageManager": "pnpm@11.23.0",
+  "packageManager": "pnpm@11.24.0",
   "type": "module",
   "exports": {
     "./preview": {
