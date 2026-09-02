@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.9](https://github.com/fohte/storybook-addon/compare/v0.1.8...v0.1.9) (2026-09-02)
+
+
+### Features
+
+* **vitest-plugin:** block external network requests in browser tests ([#68](https://github.com/fohte/storybook-addon/issues/68)) ([59c35bd](https://github.com/fohte/storybook-addon/commit/59c35bdfb366ac52e4da0c77f175d08c940a6bab))
+
+
+### Bug Fixes
+
+* **checks:** detect external resource requests completing across story transitions ([#69](https://github.com/fohte/storybook-addon/issues/69)) ([5dd5e3f](https://github.com/fohte/storybook-addon/commit/5dd5e3fd61fae322bca61fb6bfcf11c7464fa932))
+* **checks:** remove dependency on vitest ([#72](https://github.com/fohte/storybook-addon/issues/72)) ([411bff3](https://github.com/fohte/storybook-addon/commit/411bff371e8afa6b759af7240ca05a8d2c6d18f6))
+
 ## [0.1.8](https://github.com/fohte/storybook-addon/compare/v0.1.7...v0.1.8) (2026-08-29)
 
 
