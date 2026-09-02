@@ -6,7 +6,12 @@ import { messageOf } from '#checks/test-helpers.js'
 // calls `new PerformanceObserver(...)` at module-load time — so the mock
 // must be in place, and the module imported dynamically, before this file's
 // static imports would otherwise load it.
-type PerformanceEntryLike = { name: string; startTime?: number }
+type PerformanceEntryLike = {
+  name: string
+  entryType?: string
+  startTime?: number
+  responseEnd?: number
+}
 type ObserverCallback = (list: {
   getEntries: () => PerformanceEntryLike[]
 }) => void
@@ -29,7 +34,12 @@ const { externalResourceCheck } =
 function emit(entries: PerformanceEntryLike[]): void {
   capturedCallback?.({
     getEntries: () =>
-      entries.map((entry) => ({ startTime: performance.now(), ...entry })),
+      entries.map((entry) => ({
+        entryType: 'resource',
+        startTime: performance.now(),
+        responseEnd: performance.now(),
+        ...entry,
+      })),
   })
 }
 
@@ -68,11 +78,24 @@ describe('externalResourceCheck', () => {
     }).not.toThrow()
   })
 
-  it('ignores an entry whose startTime is before the last reset', () => {
-    emit([{ name: 'https://cdn.example.test/font.woff2', startTime: 0 }])
+  it('ignores an entry whose responseEnd is before the last reset', () => {
+    emit([{ name: 'https://cdn.example.test/font.woff2', responseEnd: 0 }])
 
     expect(() => {
       externalResourceCheck.assert()
     }).not.toThrow()
+  })
+
+  it('records an entry that started before reset but completed after it', () => {
+    emit([{ name: 'https://cdn.example.test/font.woff2', startTime: 0 }])
+
+    expect(
+      messageOf(() => {
+        externalResourceCheck.assert()
+      }),
+    ).toEqual(
+      'Story loaded non-same-origin resource(s), which makes VRT captures flaky:\n' +
+        'https://cdn.example.test/font.woff2',
+    )
   })
 })

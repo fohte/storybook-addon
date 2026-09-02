@@ -20,9 +20,18 @@ function isExternalResourceUrl(url: string): boolean {
   )
 }
 
+function isPerformanceResourceTiming(
+  entry: PerformanceEntry,
+): entry is PerformanceResourceTiming {
+  return entry.entryType === 'resource'
+}
+
 new PerformanceObserver((list) => {
   for (const entry of list.getEntries()) {
-    if (entry.startTime >= resetAt && isExternalResourceUrl(entry.name)) {
+    if (!isPerformanceResourceTiming(entry)) continue
+    // Entries are queued at completion, so responseEnd (not startTime) is
+    // what must be compared against resetAt.
+    if (entry.responseEnd >= resetAt && isExternalResourceUrl(entry.name)) {
       externalResourceUrls.push(entry.name)
     }
   }
