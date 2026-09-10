@@ -101,9 +101,6 @@ function installFetchTracker(): void {
   }
 }
 
-// ponytail: bounded wait, so a story that deliberately leaves a matching
-// fetch pending forever (e.g. to render a "loading" state) doesn't hang the
-// suite -- raise this if MSW's interception proves slower in practice.
 const PENDING_FETCH_TIMEOUT_MS = 2000
 
 // preview.ts's afterEach awaits this before running any check's assert(),
