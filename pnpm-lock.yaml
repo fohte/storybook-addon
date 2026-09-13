@@ -31,8 +31,8 @@ importers:
         specifier: 10.5.10
         version: 10.5.10(esbuild@0.28.2)(storybook@10.5.10(prettier@3.9.6)(react@19.2.8))(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.6.1))
       '@storycap-testrun/browser':
-        specifier: 2.1.1
-        version: 2.1.1(@vitest/browser-playwright@4.1.11)
+        specifier: 3.0.1
+        version: 3.0.1(@vitest/browser-playwright@4.1.11)
       '@tsconfig/node-lts':
         specifier: 24.0.1
         version: 24.0.1
@@ -945,13 +945,15 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
-  '@storycap-testrun/browser@2.1.1':
-    resolution: {integrity: sha512-LQpkmPExjdojELXNzw98IBgWnX2LYkCRzZ4gyBvUk+4ut1vNCOQhbMrT6dhRa/h31OdP/E2utoJXHoITYQKjTw==}
+  '@storycap-testrun/browser@3.0.1':
+    resolution: {integrity: sha512-pytrdPLMXxXy2dKKcu23QyOa6KoQLljRu3DkK2s66WTtFO4fXXF4Mfd2X4jBLkHUdjzgTZhq7O+g/R90SofH2w==}
+    engines: {node: '>=22'}
     peerDependencies:
       '@vitest/browser-playwright': '*'
 
-  '@storycap-testrun/internal@2.1.1':
-    resolution: {integrity: sha512-+B+bx8C9ylqVCNJJ6cU3Zrwd+zmjUA4frKrvXUwTUOH1an5DJPYoPELFuwADLoBhCvkiCLqaPabdlmn5j8xcVw==}
+  '@storycap-testrun/internal@3.0.1':
+    resolution: {integrity: sha512-/c8djRecVyuU+97LPSEtTwc7S7h4V8N5OpyiW+2puj95t78EunEc63WUkfIjlC8n5TXujHWxHWjHeEI0aGVKCw==}
+    engines: {node: '>=22'}
 
   '@testing-library/dom@10.4.1':
     resolution: {integrity: sha512-o4PXJQidqJl82ckFaXUeoAW+XysPLauYI43Abki5hABd853iMhitooc6znOnczgbTYmEP6U6/y1ZyKAIsvMKGg==}
@@ -3085,12 +3087,12 @@ snapshots:
     dependencies:
       react: 19.2.8
 
-  '@storycap-testrun/browser@2.1.1(@vitest/browser-playwright@4.1.11)':
+  '@storycap-testrun/browser@3.0.1(@vitest/browser-playwright@4.1.11)':
     dependencies:
-      '@storycap-testrun/internal': 2.1.1
+      '@storycap-testrun/internal': 3.0.1
       '@vitest/browser-playwright': 4.1.11(playwright@1.62.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.6.1))(vitest@4.1.11)
 
-  '@storycap-testrun/internal@2.1.1': {}
+  '@storycap-testrun/internal@3.0.1': {}
 
   '@testing-library/dom@10.4.1':
     dependencies:
