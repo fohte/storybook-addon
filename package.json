@@ -47,7 +47,7 @@
   },
   "peerDependencies": {
     "@storybook/addon-vitest": "^10.0.0",
-    "@storycap-testrun/browser": "^2.0.0",
+    "@storycap-testrun/browser": "^3.0.0",
     "@vitest/browser-playwright": "^4.0.0",
     "storybook": "^10.0.0",
     "vitest": "^4.0.0"
@@ -73,7 +73,7 @@
     "@ninoseki/eslint-plugin-neverthrow": "0.2.0",
     "@storybook/addon-vitest": "10.5.10",
     "@storybook/html-vite": "10.5.10",
-    "@storycap-testrun/browser": "2.1.1",
+    "@storycap-testrun/browser": "3.0.1",
     "@tsconfig/node-lts": "24.0.1",
     "@tsconfig/strictest": "2.0.8",
     "@types/jsdom": "30.0.0",
