@@ -11,7 +11,7 @@ import { createStorybookProject } from './src/vitest-plugin.ts'
 const rootDir = import.meta.dirname
 
 // Inline vitest projects don't inherit the root `resolve.alias` on the
-// vitest@4.1.10 pinned here, unlike vitest 5's default — so every project
+// vitest@4.1.11 pinned here, unlike vitest 5's default — so every project
 // that imports a `#*.js` path needs its own copy.
 const resolve = {
   alias: [
@@ -50,5 +50,9 @@ export default defineConfig({
         setupFiles: ['./.storybook/vitest.setup.ts'],
       }),
     ],
+    // Spelled out (matching Vitest's own default) so knip's static analysis
+    // of this file can resolve test entry files; Vitest's own runtime
+    // behavior is unchanged.
+    include: ['**/*.{test,spec}.?(c|m)[jt]s?(x)'],
   },
 })
