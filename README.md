@@ -108,7 +108,7 @@ export default defineConfig({
 })
 ```
 
-Screenshots for a project land in `<rootDir>/__screenshots__/<screenshotsSubdir>` — downstream tooling that consumes these images depends on this exact path, so treat it as a stable contract rather than an implementation detail.
+Screenshots for a project land in `<rootDir>/__screenshots__/<screenshotsSubdir>/<story file path>/<story ID suffix>.png`. The suffix is the part after the final `--` in the story ID, derived from the CSF export name, so it stays stable when a story's display name changes. Existing filenames change to this format when consumers upgrade, so regenerate the baselines on the first run. Downstream tooling depends on this exact path, so treat it as a stable contract rather than an implementation detail.
 
 `storycapNetworkIdle` and `storycapFullPageStitch` are also exported on their own, for building a project without `createStorybookProject`. `storycapFullPageStitch` must be placed after storycap's own plugin in the `plugins` array — it works by overriding the `__storycap_takeScreenshot` command storycap registers, and Vite resolves conflicting plugin `config()` keys in plugin order, later wins.
 
