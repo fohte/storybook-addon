@@ -20,7 +20,6 @@ function asPlugin(plugin: unknown): any {
   return plugin
 }
 
-// The ID suffix stays tied to the CSF export when a story's display name changes.
 function storyExportId(id: string): string {
   const separatorIndex = id.lastIndexOf('--')
   return separatorIndex === -1 ? id : id.slice(separatorIndex + 2)
@@ -86,10 +85,13 @@ export interface CreateStorybookProjectOptions {
   rootDir: string
   viewport: { width: number; height: number }
   /**
-   * Screenshots for this project are written to
-   * `<rootDir>/__screenshots__/<screenshotsSubdir>`. Downstream tooling that
-   * consumes these images depends on this exact path, so treat it as a
-   * stable contract rather than an implementation detail.
+   * Screenshots are written to
+   * `<rootDir>/__screenshots__/<screenshotsSubdir>/<story file path>/<story ID suffix>.png`,
+   * where the suffix is the part after the final `--` and is derived from the
+   * CSF export name. It stays stable when the story's display name changes.
+   * Existing filenames change to this format when consumers upgrade.
+   * Downstream tooling depends on this exact path, so treat it as a stable
+   * contract rather than an implementation detail.
    */
   screenshotsSubdir: string
   setupFiles: string[]
