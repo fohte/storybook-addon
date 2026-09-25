@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.2.0](https://github.com/fohte/storybook-addon/compare/v0.1.9...v0.2.0) (2026-09-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* **peer:** bump @storycap-testrun/browser to v3 ([#75](https://github.com/fohte/storybook-addon/issues/75))
+
+### Bug Fixes
+
+* **vitest-plugin:** prevent baseline breakage on story display name changes ([#88](https://github.com/fohte/storybook-addon/issues/88)) ([a3a8ac9](https://github.com/fohte/storybook-addon/commit/a3a8ac9b611b71d0bc7ac209d31533ad03290e70))
+
+
+### Dependencies
+
+* **peer:** bump @storycap-testrun/browser to v3 ([#75](https://github.com/fohte/storybook-addon/issues/75)) ([0d090b2](https://github.com/fohte/storybook-addon/commit/0d090b22f08fb2c7ccc412b2b19b1ad09b9d8f88))
+
 ## [0.1.9](https://github.com/fohte/storybook-addon/compare/v0.1.8...v0.1.9) (2026-09-02)
 
 
