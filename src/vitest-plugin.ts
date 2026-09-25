@@ -20,6 +20,12 @@ function asPlugin(plugin: unknown): any {
   return plugin
 }
 
+// The ID suffix stays tied to the CSF export when a story's display name changes.
+function storyExportId(id: string): string {
+  const separatorIndex = id.lastIndexOf('--')
+  return separatorIndex === -1 ? id : id.slice(separatorIndex + 2)
+}
+
 // @storycap-testrun/browser waits for 500ms of network silence before every
 // capture and exposes no option to shorten it, so every story pays that flat
 // half second per viewport. Only the floor moves: the window still restarts on
@@ -140,7 +146,10 @@ export function createStorybookProject({
     asPlugin(
       storycap({
         viewport,
-        output: { dir: screenshotsDir },
+        output: {
+          dir: screenshotsDir,
+          file: ({ file, id }) => path.join(file, `${storyExportId(id)}.png`),
+        },
       }),
     ),
     storycapFullPageStitch({ viewport }),
