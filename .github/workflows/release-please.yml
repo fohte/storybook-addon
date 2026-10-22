@@ -8,9 +8,14 @@ name: release-please
 
 jobs:
   release-please:
+    concurrency:
+      group: release-please-${{ github.repository }}
+      cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
+    timeout-minutes: 30
     permissions:
       id-token: write
     steps:
