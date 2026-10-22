@@ -1,4 +1,5 @@
 {
+<<<<<<< before updating
   "name": "@fohte/storybook-addon",
   "description": "@fohte's personal Storybook addons",
   "license": "MIT",
@@ -8,6 +9,15 @@
     "url": "https://github.com/fohte/storybook-addon.git"
   },
   "packageManager": "pnpm@12.4.0",
+||||||| last update
+  "name": "storybook-addon",
+  "private": true,
+  "packageManager": "pnpm@12.3.4",
+=======
+  "name": "storybook-addon",
+  "private": true,
+  "packageManager": "pnpm@12.7.0",
+>>>>>>> after updating
   "type": "module",
   "exports": {
     "./preview": {
@@ -67,23 +77,23 @@
     "neverthrow": "8.2.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "21.2.2",
+    "@commitlint/cli": "21.2.3",
     "@fohte/eslint-config": "0.5.1",
-    "@ninoseki/eslint-plugin-neverthrow": "0.3.1",
+    "@ninoseki/eslint-plugin-neverthrow": "0.3.2",
     "@storybook/addon-vitest": "10.6.0",
     "@storybook/html-vite": "10.6.0",
     "@storycap-testrun/browser": "3.1.0",
     "@tsconfig/node-lts": "24.0.1",
     "@tsconfig/strictest": "2.0.8",
     "@types/jsdom": "30.0.0",
-    "@types/node": "24.13.6",
+    "@types/node": "24.19.0",
     "@vitest/browser-playwright": "4.1.11",
     "concurrently": "10.0.5",
     "eslint": "10.11.0",
     "jsdom": "30.0.1",
     "playwright": "1.63.0",
-    "knip": "6.37.0",
-    "prettier": "3.9.8",
+    "knip": "6.38.0",
+    "prettier": "3.9.9",
     "rimraf": "6.1.3",
     "storybook": "10.6.0",
     "typescript": "6.0.3",
