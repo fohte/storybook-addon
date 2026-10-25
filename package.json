@@ -70,7 +70,7 @@
     "@commitlint/cli": "21.2.2",
     "@fohte/eslint-config": "0.5.1",
     "@ninoseki/eslint-plugin-neverthrow": "0.3.1",
-    "@storybook/addon-vitest": "10.6.0",
+    "@storybook/addon-vitest": "10.6.2",
     "@storybook/html-vite": "10.6.0",
     "@storycap-testrun/browser": "3.1.0",
     "@tsconfig/node-lts": "24.0.1",
