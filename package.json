@@ -1,5 +1,4 @@
 {
-<<<<<<< before updating
   "name": "@fohte/storybook-addon",
   "description": "@fohte's personal Storybook addons",
   "license": "MIT",
@@ -8,16 +7,7 @@
     "type": "git",
     "url": "https://github.com/fohte/storybook-addon.git"
   },
-  "packageManager": "pnpm@12.4.0",
-||||||| last update
-  "name": "storybook-addon",
-  "private": true,
-  "packageManager": "pnpm@12.3.4",
-=======
-  "name": "storybook-addon",
-  "private": true,
   "packageManager": "pnpm@12.7.0",
->>>>>>> after updating
   "type": "module",
   "exports": {
     "./preview": {
