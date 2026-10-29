@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { findTransparentRows } from '#find-transparent-rows.js'
+import { findTransparentRows } from '#__fixtures__/find-transparent-rows.js'
 
 function rgbaData(rows: number[][]): Uint8ClampedArray {
   return new Uint8ClampedArray(rows.flat())

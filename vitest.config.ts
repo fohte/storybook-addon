@@ -42,13 +42,16 @@ export default defineConfig({
       // fullPage tiling/clip path (see storycap-fullpage-stitch.ts) shows up
       // as a failing pixel assertion instead of only being caught by a
       // downstream consumer's own VRT run.
-      createStorybookProject({
-        name: 'storybook-fixture',
-        rootDir,
-        viewport: { width: 1280, height: 800 },
-        screenshotsSubdir: 'fixture',
-        setupFiles: ['./.storybook/vitest.setup.ts'],
-      }),
+      {
+        ...createStorybookProject({
+          name: 'storybook-fixture',
+          rootDir,
+          viewport: { width: 1280, height: 800 },
+          screenshotsSubdir: 'fixture',
+          setupFiles: ['./.storybook/vitest.setup.ts'],
+        }),
+        resolve,
+      },
     ],
     // Spelled out (matching Vitest's own default) so knip's static analysis
     // of this file can resolve test entry files; Vitest's own runtime

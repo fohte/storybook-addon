@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/html-vite'
 import { expect } from 'storybook/test'
 import { commands } from 'vitest/browser'
 
-import { findTransparentRows } from '#find-transparent-rows.js'
+import { findTransparentRows } from '#__fixtures__/find-transparent-rows.js'
 
 declare module 'vitest/browser' {
   interface BrowserCommands {

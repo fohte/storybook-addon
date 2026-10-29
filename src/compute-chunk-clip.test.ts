@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { computeChunkClip } from '#storycap-fullpage-stitch.js'
+import { computeChunkClip } from '#compute-chunk-clip.js'
 
 describe('computeChunkClip', () => {
   it('is not offset when the requested scroll position is not clamped', () => {

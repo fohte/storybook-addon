@@ -4,7 +4,7 @@
     "@tsconfig/strictest/tsconfig.json"
   ],
   "include": ["**/*.ts", ".storybook/**/*.ts"],
-  "exclude": ["**/*.cjs"],
+  "exclude": ["**/*.cjs", "lib/**"],
   "compilerOptions": {
     "module": "preserve",
     "moduleResolution": "bundler",
