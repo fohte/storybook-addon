@@ -165,10 +165,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      neverthrow:
-        specifier: 8.2.0
-        version: 8.2.0
     devDependencies:
       '@commitlint/cli':
         specifier: 21.2.3
@@ -215,6 +211,9 @@ importers:
       knip:
         specifier: 6.38.0
         version: 6.38.0
+      neverthrow:
+        specifier: 8.2.0
+        version: 8.2.0
       playwright:
         specifier: 1.63.0
         version: 1.63.0

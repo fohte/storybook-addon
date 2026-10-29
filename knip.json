@@ -3,5 +3,16 @@
   "treatConfigHintsAsErrors": true,
   "ignoreDependencies": ["@commitlint/cli"],
   "ignore": ["commitlint-plugin-no-external-refs.cjs"],
-  "entry": ["src/preview.ts", "src/vitest-plugin.ts"]
+  "entry": [
+    "src/preview.ts!",
+    "src/vitest-plugin.ts!",
+    "src/vitest-viewport-setup.ts!"
+  ],
+  "project": [
+    "src/**/*.ts!",
+    "!src/**/*.test.ts!",
+    "!src/**/test-helpers.ts!",
+    "!src/__fixtures__/**!",
+    "!src/find-transparent-rows.ts!"
+  ]
 }
