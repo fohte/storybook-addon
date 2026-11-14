@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/fohte/storybook-addon/compare/v0.2.0...v0.2.1) (2026-11-14)
+
+
+### Bug Fixes
+
+* **vitest-plugin:** allow browser API permissions ([#94](https://github.com/fohte/storybook-addon/issues/94)) ([7383a1f](https://github.com/fohte/storybook-addon/commit/7383a1f58d2cb3f1a387f60d4a310368138459c7))
+
 ## [0.2.0](https://github.com/fohte/storybook-addon/compare/v0.1.9...v0.2.0) (2026-09-25)
 
 

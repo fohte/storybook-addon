@@ -64,7 +64,7 @@
       "optional": true
     }
   },
-  "version": "0.2.0",
+  "version": "0.2.1",
   "devDependencies": {
     "@commitlint/cli": "21.2.3",
     "@fohte/eslint-config": "0.5.1",
