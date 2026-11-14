@@ -23,6 +23,7 @@ describe('createStorybookProject', () => {
     })
 
     expect(project.test.browser.api).toEqual({
+      host: 'localhost',
       allowWrite: true,
       allowExec: true,
     })
