@@ -42,8 +42,8 @@
     "format": "conc -m 1 pnpm:format:eslint pnpm:format:prettier",
     "test": "conc pnpm:test:type pnpm:test:unit",
     "test:type": "tsc --noEmit",
-    "pretest:unit": "pnpm run build",
     "test:unit": "pnpm run test:root-browser && vitest run",
+    "pretest:root-browser": "pnpm run build",
     "test:root-browser": "vitest run --config vitest.root.config.ts"
   },
   "peerDependencies": {

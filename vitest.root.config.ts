@@ -2,8 +2,8 @@ import { join } from 'node:path'
 
 import { defineConfig } from 'vitest/config'
 
-// The root-level browser config exercises addon-vitest's root permission path.
-// eslint-disable-next-line no-restricted-imports -- use source directly so config works before the build output exists
+// This root-level config exercises addon-vitest's root permission path.
+// eslint-disable-next-line no-restricted-imports -- test the source factory rather than the package export
 import { createStorybookProject } from './src/vitest-plugin.ts'
 
 const rootDir = import.meta.dirname
