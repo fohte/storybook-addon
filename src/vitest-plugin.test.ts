@@ -1,13 +1,34 @@
+import path from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
 import { messageOf } from '#checks/test-helpers.js'
-import { storycapNetworkIdle } from '#vitest-plugin.js'
+import { createStorybookProject, storycapNetworkIdle } from '#vitest-plugin.js'
 
 const STORYCAP_ID = '/node_modules/@storycap-testrun/browser/dist/index.mjs'
+const rootDir = path.resolve(import.meta.dirname, '..')
 
 function withPerfObserver(code: string): string {
   return `${code}\n// uses PerformanceObserver for stability checks`
 }
+
+describe('createStorybookProject', () => {
+  it('enables browser API write and exec permissions for screenshot capture', () => {
+    const project = createStorybookProject({
+      name: 'permissions-test',
+      rootDir,
+      viewport: { width: 1280, height: 800 },
+      screenshotsSubdir: 'permissions-test',
+      setupFiles: ['./.storybook/vitest.setup.ts'],
+    })
+
+    expect(project.test.browser.api).toEqual({
+      host: 'localhost',
+      allowWrite: true,
+      allowExec: true,
+    })
+  })
+})
 
 describe('storycapNetworkIdle', () => {
   it('leaves non-storycap modules untouched', () => {

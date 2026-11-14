@@ -195,6 +195,11 @@ export function createStorybookProject({
       }),
       browser: {
         enabled: true,
+        api: {
+          host: 'localhost',
+          allowWrite: true,
+          allowExec: true,
+        },
         // Pin the browser's timezone so time-dependent stories (calendar
         // "now" indicators, relative timestamps) render identically
         // regardless of the host machine's local timezone.
