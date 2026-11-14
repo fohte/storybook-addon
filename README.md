@@ -84,6 +84,8 @@ Builds a Vitest browser-mode project that runs Storybook stories through [`@stor
 
 `viewport` applies for the whole test, not just the screenshot: mount and `play()` render at it too. `@storybook/addon-vitest` would otherwise silently mount/run every story at its own fixed 1200x900 default instead.
 
+`createStorybookProject` enables Vitest browser API write and exec permissions so storycap can use CDP while capturing screenshots.
+
 ```ts
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
